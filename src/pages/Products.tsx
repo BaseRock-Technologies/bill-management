@@ -23,7 +23,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/products/");
+        const res = await fetch(`${import.meta.env.BACKEND_URL}/products/`);
         const data = await res.json();
 
         clearAllProducts(); // Clear existing products

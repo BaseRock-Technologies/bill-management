@@ -31,11 +31,11 @@ export const useBillStore = create<BillState>()(
         };
 
         try {
-        const res = await fetch("http://localhost:8000/bills/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bills/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
             body: JSON.stringify(newBill),
           });
 
@@ -50,15 +50,15 @@ export const useBillStore = create<BillState>()(
           }));
       
           return data;
-          } catch (err: any) {
-            console.error("Billing error:", err.message);
-            return null;
-          }
+        } catch (err: any) {
+          console.error("Billing error:", err.message);
+          return null;
+        }
       },
 
       getBills: async () => {
         try {
-          const res = await fetch("http://localhost:8000/bills/");
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bills/`);
           const data = await res.json();
 
           set(() => ({
@@ -72,7 +72,6 @@ export const useBillStore = create<BillState>()(
         return [] as Bill[];
       },
 
-      
     }),
     {
       name: 'bill-storage'
