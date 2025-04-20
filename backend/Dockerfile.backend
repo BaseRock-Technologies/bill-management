@@ -19,6 +19,7 @@ RUN pip install python-dotenv
 # Directly set environment variables (example)
 ENV MONGO_URI="mongodb+srv://baserockservices:admin@cluster0.rclibx9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
+
 EXPOSE 8000
 
 # Use environment variables from .env (optional as you're directly setting them above)
