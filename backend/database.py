@@ -14,3 +14,4 @@ except Exception as e:
 
 db = client.bill_db
 product_collection = db.products
+bill_collection = db.bills

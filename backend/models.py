@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
+from datetime import datetime
 
 class Product(BaseModel):
     product_id: str = Field(..., example="P001")
@@ -10,4 +11,19 @@ class Product(BaseModel):
 
 class BillItem(BaseModel):
     product_id: str
-    quantity: int
+    product_name: str
+    price: float
+    gst_percentage: Optional[float] = 0.0
+    quantity: Optional[int] = 0
+    billQuantity: int
+    discount: Optional[float] = 0.0
+    total: float
+    gstAmount: float
+
+class Bill(BaseModel):
+    items: List[BillItem]
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    subtotal: float
+    totalGst: float
+    totalDiscount: float
+    grandTotal: float

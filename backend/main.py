@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from models import Product
-from database import product_collection
-from bson import ObjectId
+from models import Product, Bill, BillItem
+from database import product_collection, bill_collection
 from fastapi import Query
 from typing import Optional
+from datetime import datetime
 
 app = FastAPI()
 
@@ -71,3 +71,38 @@ def get_products(
 
     products = list(product_collection.find(filters, {"_id": 0}).skip(skip).limit(limit))
     return products
+
+# Bill Management
+@app.post("/bills/")
+def create_bill(bill: Bill):
+    bill_dict = bill.dict()
+    result = bill_collection.insert_one(bill_dict)
+    return {"message": "Bill saved", "id": str(result.inserted_id)}
+
+@app.get("/bills/")
+def get_bills(
+    min_total: Optional[float] = Query(None),
+    max_total: Optional[float] = Query(None),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    skip: int = 0,
+    limit: int = 10
+):
+    filters = {}
+
+    if min_total or max_total:
+        filters["grandTotal"] = {}
+        if min_total:
+            filters["grandTotal"]["$gte"] = min_total
+        if max_total:
+            filters["grandTotal"]["$lte"] = max_total
+
+    if start_date or end_date:
+        filters["timestamp"] = {}
+        if start_date:
+            filters["timestamp"]["$gte"] = datetime.fromisoformat(start_date)
+        if end_date:
+            filters["timestamp"]["$lte"] = datetime.fromisoformat(end_date)
+
+    bills = list(bill_collection.find(filters, {"_id": 0}).skip(skip).limit(limit))
+    return bills
