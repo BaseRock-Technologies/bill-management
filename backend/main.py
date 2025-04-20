@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from models import Product, Bill, BillItem
-from database import product_collection, bill_collection
+from models import Product, Bill, BillItem, UserLogin
+from database import product_collection, bill_collection, user_collection
 from fastapi import Query
 from typing import Optional
 from datetime import datetime
@@ -106,3 +106,21 @@ def get_bills(
 
     bills = list(bill_collection.find(filters, {"_id": 0}).skip(skip).limit(limit))
     return bills
+
+
+@app.post("/login/")
+def login(user: UserLogin):
+    db_user = user_collection.find_one({"username": user.username})
+    
+    if not db_user or user.password != db_user["password"]:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    return {"message": "Login successful", "username": db_user["username"]}
+
+@app.post("/users/")
+def create_user(user: UserLogin):
+    if user_collection.find_one({"username": user.username}):
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    user_collection.insert_one(user.dict())
+    return {"message": "User created successfully", "username": user.username}

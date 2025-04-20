@@ -27,3 +27,7 @@ class Bill(BaseModel):
     totalGst: float
     totalDiscount: float
     grandTotal: float
+    
+class UserLogin(BaseModel):
+    username: str
+    password: str
