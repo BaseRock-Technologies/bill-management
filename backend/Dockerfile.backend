@@ -2,12 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Copy requirements first for better caching
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy .env file
+COPY .env .
+
+# Copy the rest of the application
 COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Install python-dotenv if not in requirements.txt
+RUN pip install python-dotenv
+
+# Use environment variables from .env
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
