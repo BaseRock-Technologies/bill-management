@@ -24,7 +24,7 @@ export const useProductStore = create<ProductState>()(
         const payload = { ...product, id, code: "0" }
         console.log(payload)
         try {
-        const res = await fetch('http://127.0.0.1:8000/products/', {
+        const res = await fetch('http://46.202.162.192/products/', {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -58,7 +58,7 @@ export const useProductStore = create<ProductState>()(
         }));
 
         try {
-          const res = await fetch('http://127.0.0.1:8000/products/${updatedProduct.id}', {
+          const res = await fetch('http://46.202.162.192/products/${updatedProduct.id}', {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export const useProductStore = create<ProductState>()(
           products: state.products.filter((product) => product.id !== id)
         }))
          try {
-          const res = await fetch('http://127.0.0.1:8000/products/${id}', {
+          const res = await fetch('http://46.202.162.192/products/${id}', {
             method: "DELETE",
           });
 
