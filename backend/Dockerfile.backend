@@ -7,9 +7,6 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy .env file (optional if setting env variables manually)
-COPY .env . 
-
 # Copy the rest of the application
 COPY . . 
 
