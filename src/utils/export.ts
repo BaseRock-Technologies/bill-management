@@ -29,7 +29,7 @@ export const exportToPDF = (data: any[], type: 'bills' | 'products') => {
   } else {
     doc.text('Products List', 14, 15);
     const productRows = data.map((product: Product) => [
-      product.code,
+      product.product_id,
       product.name,
       `₹${product.price}`,
       product.quantity?.toString() || '0',
@@ -37,7 +37,7 @@ export const exportToPDF = (data: any[], type: 'bills' | 'products') => {
     ]);
 
     (doc as any).autoTable({
-      head: [['Code', 'Name', 'Price', 'Quantity', 'GST %']],
+      head: [['Product ID', 'Name', 'Price', 'Quantity', 'GST %']],
       body: productRows,
       startY: 20,
     });
@@ -63,7 +63,7 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                 ? ['Bill ID', 'Date', 'Items', 'Subtotal', 'GST', 'Discount', 'Total'].map(
                     header => new TableCell({ children: [new Paragraph({ text: header })] })
                   )
-                : ['Code', 'Name', 'Price', 'Quantity', 'GST %'].map(
+                : ['Product ID', 'Name', 'Price', 'Quantity', 'GST %'].map(
                     header => new TableCell({ children: [new Paragraph({ text: header })] })
                   ),
             }),
@@ -80,7 +80,7 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                       `₹${item.grandTotal.toFixed(2)}`
                     ].map(cell => new TableCell({ children: [new Paragraph({ text: cell })] }))
                   : [
-                      item.code,
+                      item.product_id,
                       item.name,
                       `₹${item.price}`,
                       item.quantity?.toString() || '0',

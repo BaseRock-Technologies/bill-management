@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Pencil, Trash2, Plus, File as FilePdf, WholeWord as FileWord, Upload, Download } from 'lucide-react';
 import Papa from 'papaparse';
 import Sidebar from '../components/Sidebar';
@@ -8,7 +8,7 @@ import { Input } from '../components/ui/input';
 import { exportToPDF, exportToWord } from '../utils/export';
 
 const Products = () => {
-  const { products, addProduct, updateProduct, deleteProduct, bulkAddProducts } = useProductStore();
+  const { products, addProduct, updateProduct, deleteProduct, bulkAddProducts, clearAllProducts, loadProducts } = useProductStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -20,7 +20,23 @@ const Products = () => {
     gstPercentage: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/products/");
+        const data = await res.json();
+
+        clearAllProducts(); // Clear existing products
+        loadProducts(data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const productData = {
       name: formData.name,
@@ -52,8 +68,8 @@ const Products = () => {
   };
 
   const handleSelectProduct = (productId: string) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
+    setSelectedProducts(prev =>
+      prev.includes(productId)
         ? prev.filter(id => id !== productId)
         : [...prev, productId]
     );
@@ -61,14 +77,14 @@ const Products = () => {
 
   const handleSelectAll = () => {
     setSelectedProducts(
-      selectedProducts.length === products.length 
-        ? [] 
+      selectedProducts.length === products.length
+        ? []
         : products.map(product => product.id)
     );
   };
 
   const handleDownload = async (type: 'pdf' | 'word') => {
-    const productsToExport = products.filter(product => 
+    const productsToExport = products.filter(product =>
       selectedProducts.length === 0 || selectedProducts.includes(product.id)
     );
 

@@ -12,7 +12,7 @@ try:
 except Exception as e:
     print(e)
 
-db = client.bill_db
+db = client.database
 product_collection = db.products
 bill_collection = db.bills
 user_collection = db.users

@@ -20,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       username: null,
+
       login: (username, password) => {
         if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
           set({ isAuthenticated: true, username });
@@ -27,9 +28,11 @@ export const useAuthStore = create<AuthState>()(
         }
         return false;
       },
+
       logout: () => {
         set({ isAuthenticated: false, username: null });
       },
+      
       updateProfile: (username) => {
         ADMIN_CREDENTIALS.username = username;
         set({ username });

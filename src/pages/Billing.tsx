@@ -10,7 +10,7 @@ import Sidebar from '../components/Sidebar';
 
 const Billing = () => {
   const { products } = useProductStore();
-  const { addBill, bills } = useBillStore();
+  const { addBill, getBills, bills } = useBillStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<BillItem[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -21,6 +21,7 @@ const Billing = () => {
       product.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredProducts(filtered);
+    getBills(); // Fetch bills 
   }, [searchTerm, products]);
 
   const handleProductSelect = (product: Product) => {
@@ -214,7 +215,7 @@ const Billing = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {bills.slice(0, 5).map((bill) => (
+                    {bills.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5).map((bill) => (
                       <tr key={bill.id} className="hover:bg-gray-50">
                         <td className="px-4 py-4 whitespace-nowrap text-sm">{bill.id.slice(0, 8)}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">

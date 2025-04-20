@@ -1,20 +1,34 @@
 from fastapi import FastAPI, HTTPException
-from models import Product, Bill, BillItem, UserLogin
-from database import product_collection, bill_collection, user_collection
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Query
+
+from models import Product, Bill, BillItem, UserLogin
+from utils import get_next_product_code
+from database import product_collection, bill_collection, user_collection
 from typing import Optional
 from datetime import datetime
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or use ["*"] to allow all (only in dev!)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Create product
 @app.post("/products/")
 def create_product(product: Product):
-    if product_collection.find_one({"product_id": product.product_id}):
+    if product_collection.find_one({"id": product.id}):
         raise HTTPException(status_code=400, detail="Product ID already exists")
+    
     product_dict = product.dict()
+    product_dict["code"] = get_next_product_code()
+
     result = product_collection.insert_one(product_dict)
-    return {"message": "Product created", "id": str(result.inserted_id)}
+    return {"message": "Product created", "id": str(result.inserted_id), "code": product_dict["code"]}
 
 # Read all products
 @app.get("/all_products/")
@@ -23,18 +37,18 @@ def get_all_products():
     return products
 
 # Read single product
-@app.get("/products/{product_id}")
-def get_product(product_id: str):
-    product = product_collection.find_one({"product_id": product_id}, {"_id": 0})
+@app.get("/products/{id}")
+def get_product(id: str):
+    product = product_collection.find_one({"id": id}, {"_id": 0})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 # Update product
-@app.put("/products/{product_id}")
-def update_product(product_id: str, updated_product: Product):
+@app.put("/products/{id}")
+def update_product(id: str, updated_product: Product):
     result = product_collection.update_one(
-        {"product_id": product_id},
+        {"id": id},
         {"$set": updated_product.dict()}
     )
     if result.matched_count == 0:
@@ -42,9 +56,9 @@ def update_product(product_id: str, updated_product: Product):
     return {"message": "Product updated"}
 
 # Delete product
-@app.delete("/products/{product_id}")
-def delete_product(product_id: str):
-    result = product_collection.delete_one({"product_id": product_id})
+@app.delete("/products/{id}")
+def delete_product(id: str):
+    result = product_collection.delete_one({"id": id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted"}
@@ -61,7 +75,7 @@ def get_products(
     filters = {}
 
     if q:
-        filters["product_name"] = {"$regex": q, "$options": "i"}  # case-insensitive
+        filters["name"] = {"$regex": q, "$options": "i"}  # case-insensitive
     if min_price is not None or max_price is not None:
         filters["price"] = {}
         if min_price is not None:
