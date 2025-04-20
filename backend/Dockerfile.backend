@@ -7,16 +7,19 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy .env file
-COPY .env .
+# Copy .env file (optional if setting env variables manually)
+COPY .env . 
 
 # Copy the rest of the application
-COPY . .
-
-EXPOSE 8000
+COPY . . 
 
 # Install python-dotenv if not in requirements.txt
 RUN pip install python-dotenv
 
-# Use environment variables from .env
+# Directly set environment variables (example)
+ENV MONGO_URI="mongodb+srv://baserockservices:admin@cluster0.rclibx9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+EXPOSE 8000
+
+# Use environment variables from .env (optional as you're directly setting them above)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
