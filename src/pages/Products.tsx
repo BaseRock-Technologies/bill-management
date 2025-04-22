@@ -17,6 +17,7 @@ const Products = () => {
     name: '',
     price: '',
     quantity: '',
+    unit: 'unit',
     gstPercentage: ''
   });
 
@@ -42,6 +43,7 @@ const Products = () => {
       name: formData.name,
       price: Number(formData.price),
       quantity: Number(formData.quantity),
+      unit: formData.unit,
       gstPercentage: Number(formData.gstPercentage)
     };
 
@@ -53,7 +55,7 @@ const Products = () => {
 
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: '', quantity: '', gstPercentage: '' });
+    setFormData({ name: '', price: '', quantity: '', unit: "", gstPercentage: '' });
   };
 
   const handleEdit = (product: Product) => {
@@ -62,7 +64,8 @@ const Products = () => {
       name: product.name,
       price: String(product.price),
       quantity: String(product.quantity || ''),
-      gstPercentage: String(product.gstPercentage || '')
+      gstPercentage: String(product.gstPercentage || ''),
+      unit: String(product.unit || '')
     });
     setIsModalOpen(true);
   };
@@ -107,6 +110,7 @@ const Products = () => {
           name: row.name,
           price: Number(row.price),
           quantity: Number(row.quantity),
+          unit: row.unit,
           gstPercentage: Number(row.gstPercentage)
         }));
         bulkAddProducts(products);
@@ -219,7 +223,7 @@ const Products = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{product.code}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{product.name}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{product.price}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">{product.quantity}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">{product.quantity} {product.unit ? " " + product.unit : ' Units'}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{product.gstPercentage}%</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">
                         <div className="flex gap-2">
@@ -281,6 +285,20 @@ const Products = () => {
                       className="w-full"
                     />
                   </div>
+                  {/* Unit Selector */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Unit</label>
+                    <select
+                      value={formData.unit}
+                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                      className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="Units">Select unit</option>
+                      <option value="Kgs">KG</option>
+                      <option value="Pieces">Pieces</option>
+                      <option value="Liters">Liters</option>
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">GST Percentage</label>
                     <Input
@@ -297,7 +315,7 @@ const Products = () => {
                       onClick={() => {
                         setIsModalOpen(false);
                         setEditingProduct(null);
-                        setFormData({ name: '', price: '', quantity: '', gstPercentage: '' });
+                        setFormData({ name: '', price: '', quantity: '', unit: '', gstPercentage: '' });
                       }}
                       className="px-4 py-2 border rounded-md hover:bg-gray-50"
                     >

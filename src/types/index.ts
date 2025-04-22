@@ -11,6 +11,7 @@ export interface Product {
   gstPercentage?: number;
   price: number;
   quantity?: number;
+  unit?: string;
 }
 
 export interface BillItem extends Product {

@@ -9,11 +9,13 @@ class Product(BaseModel):
     gstPercentage: Optional[float] = Field(None, example=18.0)
     price: float = Field(..., example=499.99)
     quantity: Optional[int] = Field(0, example=100)
+    unit: Optional[str] = Field(0, example='kg')
 
 class BillItem(BaseModel):
     id: str
     code: str
     name: str
+    unit: str
     price: float
     gstPercentage: Optional[float] = 0.0
     quantity: Optional[int] = 0
