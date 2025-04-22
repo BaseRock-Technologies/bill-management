@@ -31,7 +31,7 @@ export const useBillStore = create<BillState>()(
         };
 
         try {
-          const res = await fetch('http://46.202.162.192/bills/', {
+          const res = await fetch('http://46.202.162.192:8000/bills/', {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -58,7 +58,7 @@ export const useBillStore = create<BillState>()(
 
       getBills: async () => {
         try {
-          const res = await fetch('http://46.202.162.192/bills/');
+          const res = await fetch('http://46.202.162.192:8000/bills/');
           const data = await res.json();
 
           set(() => ({

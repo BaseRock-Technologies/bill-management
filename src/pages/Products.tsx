@@ -23,7 +23,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://46.202.162.192/products/');
+        const res = await fetch('http://46.202.162.192:8000/products/');
         const data = await res.json();
 
         clearAllProducts(); // Clear existing products
