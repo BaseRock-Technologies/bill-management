@@ -13,7 +13,6 @@ COPY . .
 # Install python-dotenv if not in requirements.txt
 RUN pip install python-dotenv
 
-
 EXPOSE 8000
 
 # Use environment variables from .env (optional as you're directly setting them above)
