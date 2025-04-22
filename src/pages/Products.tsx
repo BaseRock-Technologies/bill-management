@@ -17,7 +17,7 @@ const Products = () => {
     name: '',
     price: '',
     quantity: '',
-    unit: 'unit',
+    unit: 'Units',
     gstPercentage: ''
   });
 
@@ -55,7 +55,7 @@ const Products = () => {
 
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: '', quantity: '', unit: "", gstPercentage: '' });
+    setFormData({ name: '', price: '', quantity: '', unit: "Units", gstPercentage: '' });
   };
 
   const handleEdit = (product: Product) => {
@@ -65,7 +65,7 @@ const Products = () => {
       price: String(product.price),
       quantity: String(product.quantity || ''),
       gstPercentage: String(product.gstPercentage || ''),
-      unit: String(product.unit || '')
+      unit: String(product.unit || 'Units')
     });
     setIsModalOpen(true);
   };
@@ -315,7 +315,7 @@ const Products = () => {
                       onClick={() => {
                         setIsModalOpen(false);
                         setEditingProduct(null);
-                        setFormData({ name: '', price: '', quantity: '', unit: '', gstPercentage: '' });
+                        setFormData({ name: '', price: '', quantity: '', unit: 'Units', gstPercentage: '' });
                       }}
                       className="px-4 py-2 border rounded-md hover:bg-gray-50"
                     >
