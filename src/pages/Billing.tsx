@@ -20,11 +20,13 @@ const Billing = () => {
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    console.log(filtered)
     setFilteredProducts(filtered);
     getBills(); // Fetch bills 
   }, [searchTerm, products]);
 
   const handleProductSelect = (product: Product) => {
+    console.log(product)
     const billItem: BillItem = {
       ...product,
       billQuantity: 1,
@@ -130,6 +132,7 @@ const Billing = () => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST %</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -142,17 +145,21 @@ const Billing = () => {
                         <td className="px-4 py-4 whitespace-nowrap text-sm">{item.name}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">{item.code}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">₹{item.price}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm">
+                        <td className="px-1 py-4 whitespace-nowrap text-sm">
                           <Input
                             type="number"
                             min="1"
                             value={item.billQuantity}
-                            onChange={(e) => updateBillItem(index, { billQuantity: Number(e.target.value) })}
+                            onChange={(e) => {
+                              updateBillItem(index, { billQuantity: Number(e.target.value) })
+                              console.log(item)
+                            }}
                             className="w-20 md:w-24"
                           />
                         </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm">{item.unit}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm">{item.gstPercentage}%</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm">
+                        <td className="px-2 py-4 whitespace-nowrap text-sm">
                           <Input
                             type="number"
                             min="0"
