@@ -107,9 +107,39 @@ export const useProductStore = create<ProductState>()(
       getProductByCode: (code) => {
         return get().products.find(product => product.code === code);
       },
+      
+      bulkAddProducts: async (newProducts) => {
+        for (const product of newProducts) {
+          const payload = {
+            ...product,
+            id: uuidv4(),
+            code: `0`
+          };
+          console.log(payload)
 
-      bulkAddProducts: (newProducts) => {
-        console.log(newProducts)
+          try {
+            const res = await fetch('http://46.202.162.192:8000/products/', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.detail || "Failed to add product");
+            }
+
+            const data = await res.json();
+
+            set((state) => ({
+              products: [...state.products, { ...payload, code: data.code }]
+            }));
+          } catch (err: any) {
+            console.error("Add error:", err.message);
+          }
+        }
       },
 
       loadProducts: (products:Product[]) => {

@@ -42,13 +42,14 @@ const Billing = () => {
     const updatedItems = selectedProducts.map((item, i) => {
       if (i === index) {
         const updatedItem = { ...item, ...updates };
-        const subtotal = updatedItem.price * updatedItem.billQuantity;
-        const gstAmount = (subtotal * (updatedItem.gstPercentage || 0)) / 100;
-        const total = subtotal - (updatedItem.discount || 0);
-        return { ...updatedItem, total, gstAmount };
+        const total = updatedItem.price * updatedItem.billQuantity;
+        const gstAmount = (total * (updatedItem.gstPercentage || 0)) / 100;
+        const grandTotal = total - (updatedItem.discount || 0);
+        return { ...updatedItem, total, gstAmount, grandTotal };
       }
       return item;
     });
+    console.log(updatedItems)
     setSelectedProducts(updatedItems);
   };
 
@@ -60,7 +61,7 @@ const Billing = () => {
     const subtotal = selectedProducts.reduce((acc, item) => acc + item.total, 0);
     const totalGst = selectedProducts.reduce((acc, item) => acc + item.gstAmount, 0);
     const totalDiscount = selectedProducts.reduce((acc, item) => acc + (item.discount || 0), 0);
-    const grandTotal = subtotal + totalGst;
+    const grandTotal = subtotal + totalGst - totalDiscount;
     return { subtotal, totalGst, totalDiscount, grandTotal };
   };
 

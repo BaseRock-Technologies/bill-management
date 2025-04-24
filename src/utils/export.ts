@@ -11,25 +11,32 @@ export const exportToPDF = (data: any[], type: 'bills' | 'products') => {
   
   if (type === 'bills') {
     doc.text('Bill History', 14, 15);
-    const billRows = data.map((bill: Bill) => [
+    const billRows = data.map((bill: Bill) => {
+    const itemDetails = bill.items.map(item =>
+      `${item.name} (x${item.billQuantity}) - Rs.${item.price}`
+    ).join('\n');
+
+    return [
       bill.id.slice(0, 8),
       format(new Date(bill.timestamp), 'dd/MM/yyyy HH:mm'),
-      bill.items.length.toString(),
-      `₹${bill.subtotal.toFixed(2)}`,
-      `₹${bill.totalGst.toFixed(2)}`,
-      `₹${bill.totalDiscount.toFixed(2)}`,
-      `₹${bill.grandTotal.toFixed(2)}`
-    ]);
+      itemDetails,
+      `Rs.${bill.subtotal.toFixed(2)}`,
+      `Rs.${bill.totalGst.toFixed(2)}`,
+      `Rs.${bill.totalDiscount.toFixed(2)}`,
+      `Rs.${bill.grandTotal.toFixed(2)}`
+    ];
+  });
+
 
     (doc as any).autoTable({
-      head: [['Bill ID', 'Date', 'Items', 'Subtotal', 'GST', 'Discount', 'Total']],
+      head: [['Bill ID', 'Date', 'Items (Name xQty - Price)', 'Subtotal', 'GST', 'Discount', 'Total']],
       body: billRows,
       startY: 20,
     });
   } else {
     doc.text('Products List', 14, 15);
     const productRows = data.map((product: Product) => [
-      product.product_id,
+      product.id,
       product.name,
       `₹${product.price}`,
       product.quantity?.toString() || '0',
@@ -73,7 +80,7 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                   ? [
                       item.id.slice(0, 8),
                       format(new Date(item.timestamp), 'dd/MM/yyyy HH:mm'),
-                      item.items.length.toString(),
+                      item.items.map(i => `${i.name} (x${i.billQuantity}) - ₹${i.price}`).join(', '),
                       `₹${item.subtotal.toFixed(2)}`,
                       `₹${item.totalGst.toFixed(2)}`,
                       `₹${item.totalDiscount.toFixed(2)}`,
