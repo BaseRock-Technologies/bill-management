@@ -14,7 +14,7 @@ const Profile = () => {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Update profile
@@ -34,18 +34,42 @@ const Profile = () => {
         return;
       }
 
-      const success = updateUserPassword(formData.currentPassword, formData.newPassword);
-      if (success) {
-        setMessage({ type: 'success', text: 'Password updated successfully' });
-        setFormData(prev => ({
-          ...prev,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }));
-      } else {
-        setMessage({ type: 'error', text: 'Current password is incorrect' });
+      try {
+        const payload = { username, password: formData.newPassword };
+        const response = await fetch("http://127.0.0.1:8000/users/update-password/", {
+          // const response = await fetch("http://46.202.162.192:8000/users/update-password//", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          return false; // login failed
+        }
+
+        const data = await response.json();
+
+        const success = updateUserPassword(formData.currentPassword, formData.newPassword);
+        if (success) {
+          setMessage({ type: 'success', text: 'Password updated successfully' });
+          setFormData(prev => ({
+            ...prev,
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          }));
+        } else {
+          setMessage({ type: 'error', text: 'Current password is incorrect' });
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Login error:", error);
+        return false;
       }
+
     }
   };
 
@@ -75,6 +99,7 @@ const Profile = () => {
                   <input
                     type="text"
                     id="username"
+                    disabled
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

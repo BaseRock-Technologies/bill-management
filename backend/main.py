@@ -138,3 +138,18 @@ def create_user(user: UserLogin):
 
     user_collection.insert_one(user.dict())
     return {"message": "User created successfully", "username": user.username}
+
+@app.post("/users/update-password/")
+def update_password(payload: UserLogin):
+    existing_user = user_collection.find_one({"username": payload.username})
+    print(payload)
+
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user_collection.update_one(
+        {"username": payload.username},
+        {"$set": {"password": payload.password}}
+    )
+
+    return {"message": "Password updated successfully", "username": payload.username}
