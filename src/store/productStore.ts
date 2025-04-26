@@ -115,7 +115,6 @@ export const useProductStore = create<ProductState>()(
             id: uuidv4(),
             code: `0`
           };
-          console.log(payload)
 
           try {
             const res = await fetch('http://46.202.162.192:8000/products/', {
@@ -136,6 +135,7 @@ export const useProductStore = create<ProductState>()(
             set((state) => ({
               products: [...state.products, { ...payload, code: data.code }]
             }));
+            
           } catch (err: any) {
             console.error("Add error:", err.message);
           }

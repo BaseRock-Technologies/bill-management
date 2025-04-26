@@ -125,7 +125,7 @@ const Products = () => {
   };
 
   const handleDownloadTemplate = () => {
-    const csvContent = "name,price,quantity,gstPercentage\nSample Product,100,10,18";
+    const csvContent = "name,price,quantity,unit,gstPercentage\nSample Product,100,10,units,18";
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -296,6 +296,7 @@ const Products = () => {
                       <option value="Units">Select unit</option>
                       <option value="Kgs">Kilo Grams</option>
                       <option value="Pieces">Pieces</option>
+                      <option value="Bundles">Bundles</option>
                       <option value="Liters">Liters</option>
                     </select>
                   </div>
