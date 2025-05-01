@@ -13,6 +13,8 @@ const Billing = () => {
   const { addBill, getBills, bills } = useBillStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<BillItem[]>([]);
+  const [CGstPercentage, setCGstPercentage] = useState<number>(0);
+  const [SGstPercentage, setSGstPercentage] = useState<number>(0);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -60,18 +62,21 @@ const Billing = () => {
   const calculateTotals = () => {
     const subtotal = selectedProducts.reduce((acc, item) => acc + item.total, 0);
     const totalGst = selectedProducts.reduce((acc, item) => acc + item.gstAmount, 0);
+    const totalCGst = (subtotal * (CGstPercentage || 0)) / 100;
+    const totalSGst = (subtotal * (SGstPercentage || 0)) / 100;
     const totalDiscount = selectedProducts.reduce((acc, item) => acc + (item.discount || 0), 0);
-    const grandTotal = subtotal + totalGst - totalDiscount;
-    return { subtotal, totalGst, totalDiscount, grandTotal };
+    const grandTotal = subtotal + totalGst + totalCGst + totalSGst - totalDiscount;
+
+    return { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal };
   };
 
   const handleCreateBill = () => {
     if (selectedProducts.length === 0) return;
-    addBill(selectedProducts);
+    addBill(selectedProducts, totalCGst, totalSGst);
     setSelectedProducts([]);
   };
 
-  const { subtotal, totalGst, totalDiscount, grandTotal } = calculateTotals();
+  const { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal } = calculateTotals();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -134,8 +139,8 @@ const Billing = () => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST %</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST (%)</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount (₹)</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -183,7 +188,35 @@ const Billing = () => {
                   </tbody>
                 </table>
 
-                <div className="mt-6 border-t pt-6">
+                <div className="flex justify-end items-center mt-2 border-t pt-2">
+                  <div className="flex items-center mr-4">
+                    <span className="text-sm text-gray-600">CGST (%) :</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      onChange={(e) => {
+                        setCGstPercentage(Number(e.target.value));
+                      }}
+                      className="w-20 md:w-24"
+                    />
+                  </div>
+                  <div className="flex items-center mr-4">
+
+                    <span className="text-sm text-gray-600">SGST (%) :</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      onChange={(e) => {
+                        setSGstPercentage(Number(e.target.value));
+                      }}
+                      className="w-20 md:w-24"
+                    /> 
+                  </div>
+                </div>
+
+                <div className="mt-2 border-t pt-2">
                   <div className="flex justify-end">
                     <div className="w-full md:w-72 space-y-2">
                       <div className="flex justify-between">
@@ -193,6 +226,14 @@ const Billing = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">GST:</span>
                         <span className="font-medium">₹{totalGst.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">CGST:</span>
+                        <span className="font-medium">₹{totalCGst.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">SGST:</span>
+                        <span className="font-medium">₹{totalSGst.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Discount:</span>

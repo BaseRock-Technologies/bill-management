@@ -5,7 +5,7 @@ import { Bill, BillItem } from '../types';
 
 interface BillState {
   bills: Bill[];
-  addBill: (items: BillItem[]) => void;
+  addBill: (items: BillItem[], totalCGstParam: number, totalSGstParam: number) => void;
   getBills: () => Bill[] | Promise<Bill[]>;
 }
 
@@ -14,11 +14,13 @@ export const useBillStore = create<BillState>()(
     (set, get) => ({
       bills: [],
 
-      addBill: async (items) => {
+      addBill: async (items, totalCGstParam, totalSGstParam) => {
         const subtotal = items.reduce((acc, item) => acc + item.total, 0);
         const totalGst = items.reduce((acc, item) => acc + item.gstAmount, 0);
         const totalDiscount = items.reduce((acc, item) => acc + (item.discount || 0), 0);
-        const grandTotal = subtotal + totalGst - totalDiscount;
+        const totalCGst = totalCGstParam;
+        const totalSGst = totalSGstParam;
+        const grandTotal = subtotal + totalGst + totalCGstParam + totalSGstParam - totalDiscount;
 
         const newBill: Bill = {
           id: uuidv4(),
@@ -26,12 +28,17 @@ export const useBillStore = create<BillState>()(
           timestamp: new Date(),
           subtotal,
           totalGst,
+          totalCGst,
+          totalSGst,
           totalDiscount,
           grandTotal
         };
 
+        console.log(newBill)
+
         try {
           const res = await fetch('http://46.202.162.192:8000/bills/', {
+          // const res = await fetch('http://127.0.0.1:8000/bills/', {
             method: "POST",
             headers: {
               "Content-Type": "application/json"

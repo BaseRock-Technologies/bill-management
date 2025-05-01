@@ -30,6 +30,8 @@ class Bill(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     subtotal: float
     totalGst: float
+    totalCGst: Optional[float] = 0.0
+    totalSGst: Optional[float] = 0.0
     totalDiscount: float
     grandTotal: float
     
