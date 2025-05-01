@@ -14,7 +14,7 @@ const Profile = () => {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {  
     e.preventDefault();
     
     // Update profile

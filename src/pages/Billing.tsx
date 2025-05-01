@@ -72,7 +72,13 @@ const Billing = () => {
 
   const handleCreateBill = () => {
     if (selectedProducts.length === 0) return;
-    addBill(selectedProducts, totalCGst, totalSGst);
+
+    const updatedProducts = selectedProducts.map((product) => ({
+      ...product,
+      unit: product.unit && product.unit.trim() !== '' ? product.unit : 'Units', // ✅ Default fallback
+    }));
+
+    addBill(updatedProducts, totalCGst, totalSGst);
     setSelectedProducts([]);
   };
 
