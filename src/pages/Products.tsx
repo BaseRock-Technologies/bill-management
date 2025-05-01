@@ -14,6 +14,7 @@ const Products = () => {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
+    code: '',
     name: '',
     price: '',
     quantity: '',
@@ -41,6 +42,7 @@ const Products = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const productData = {
+      code: formData.code,
       name: formData.name,
       price: Number(formData.price),
       quantity: Number(formData.quantity),
@@ -49,19 +51,20 @@ const Products = () => {
     };
 
     if (editingProduct) {
-      updateProduct({ ...productData, id: editingProduct.id, code: editingProduct.code });
+      updateProduct({ ...productData, id: editingProduct.id });
     } else {
       addProduct(productData);
     }
 
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', price: '', quantity: '', unit: "Units", gstPercentage: '' });
+    setFormData({ code: '', name: '', price: '', quantity: '', unit: "Units", gstPercentage: '' });
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     setFormData({
+      code: product.code,
       name: product.name,
       price: String(product.price),
       quantity: String(product.quantity || ''),
@@ -257,6 +260,16 @@ const Products = () => {
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700">Code</label>
+                    <Input
+                      type="text"
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">Name</label>
                     <Input
                       type="text"
@@ -317,7 +330,7 @@ const Products = () => {
                       onClick={() => {
                         setIsModalOpen(false);
                         setEditingProduct(null);
-                        setFormData({ name: '', price: '', quantity: '', unit: 'Units', gstPercentage: '' });
+                        setFormData({ code: '', name: '', price: '', quantity: '', unit: 'Units', gstPercentage: '' });
                       }}
                       className="px-4 py-2 border rounded-md hover:bg-gray-50"
                     >

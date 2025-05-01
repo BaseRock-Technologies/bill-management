@@ -9,85 +9,116 @@ import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 
 // Assuming Bill and Product types are already defined
-
 export const exportToPDF = (selectedBills: Bill[]) => {
   const doc = new jsPDF();
-  selectedBills.forEach((bill) => {
 
-    // --- Header: Seller Details
+  selectedBills.forEach((bill, billIndex) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+
+    // Outer border
+    doc.setDrawColor(0);
+    doc.rect(margin, margin, pageWidth - 2 * margin, 270);
+
+    // Seller Details box
     doc.setFontSize(12);
-    doc.text('SIVARAM TRADERS', 14, 15);
+    doc.text('SIVARAM TRADERS', 14, 20);
     doc.setFontSize(10);
-    doc.text('629/A Bypass Road, Sattur-626203', 14, 22);
-    doc.text('Ph: 9600662773', 14, 27);
-    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 32);
-    doc.text('State: Tamil Nadu, Code: 33', 14, 37);
+    doc.text('629/A Bypass Road, Sattur-626203', 14, 26);
+    doc.text('Ph: 9600662773', 14, 31);
+    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 36);
+    doc.text('State: Tamil Nadu, Code: 33', 14, 41);
+    doc.rect(12, 15, 90, 30); // Seller info border
 
-    // --- Invoice Info
+    // Invoice Info box
     doc.setFontSize(12);
-    doc.text('Tax Invoice', 150, 15);
+    doc.text('Tax Invoice', 150, 20);
     doc.setFontSize(10);
-    doc.text(`Invoice No: ${bill.id.slice(0, 8)}`, 150, 22);
-    doc.text(`Date: ${format(new Date(bill.timestamp), 'dd-MMM-yyyy')}`, 150, 27);
-    doc.text(`Mode/Terms: 10 Days Credit`, 150, 32);
+    doc.text(`Invoice No: ${bill.id.slice(0, 8)}`, 150, 26);
+    doc.text(`Date: ${format(new Date(bill.timestamp), 'dd-MMM-yyyy')}`, 150, 31);
+    doc.text('Mode/Terms: 10 Days Credit', 150, 36);
+    doc.rect(140, 15, 60, 30); // Invoice info border
 
-    // --- Buyer Info
+    // Buyer Info box
     doc.setFontSize(11);
-    doc.text('Buyer:', 14, 45);
+    doc.text('From:', 14, 52);
     doc.setFontSize(10);
-    doc.text('M.A.S TRADERS - KOVILPATTI', 14, 50);
-    doc.text('6/278-5, Main Road, Nellai Main Road,', 14, 55);
-    doc.text('Kovilpatti - 628502', 14, 60);
-    doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 65);
-    doc.text('State: Tamil Nadu, Code: 33', 14, 70);
+    doc.text('M.A.S TRADERS - KOVILPATTI', 14, 57);
+    doc.text('6/278-5, Main Road, Nellai Main Road,', 14, 62);
+    doc.text('Kovilpatti - 628502', 14, 67);
+    doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 72);
+    doc.text('State: Tamil Nadu, Code: 33', 14, 77);
+    doc.rect(12, 48, 188, 35); // Buyer info border
 
-    // --- Products Table
+    // Products Table
     const itemRows = bill.items.map((item, index) => ([
       index + 1,
       item.name,
-      // item.hsnSac || '', // If you have it
+      item.code || '',
       `${item.gstPercentage || 18}%`,
-      `${item.billQuantity} nos`,
+      `${item.billQuantity} ${item.unit || 'Units'}`,
       `Rs.${item.price.toFixed(2)}`,
       `Rs.${(item.billQuantity * item.price).toFixed(2)}`
     ]));
 
     (doc as any).autoTable({
-      head: [['Sl', 'Description', 'HSN/SAC', 'GST Rate', 'Quantity', 'Rate', 'Amount']],
+      head: [['Sl', 'Product Name', 'HSN/SAC', 'GST Rate', 'Quantity', 'Rate', 'Amount']],
       body: itemRows,
-      startY: 80,
+      startY: 88,
       theme: 'grid',
       styles: { fontSize: 9 },
+      headStyles: { fillColor: [200, 200, 200] }
     });
 
     const finalY = (doc as any).lastAutoTable.finalY;
 
-    // --- Totals and GST
-    doc.text(`Subtotal: Rs.${bill.subtotal.toFixed(2)}`, 140, finalY + 10);
-    doc.text(`GST: Rs.${bill.totalGst.toFixed(2)}`, 140, finalY + 16);
-    doc.text(`CGST: Rs.${bill.totalCGst.toFixed(2)}`, 140, finalY + 22);
-    doc.text(`SGST: Rs.${bill.totalSGst.toFixed(2)}`, 140, finalY + 28);
-    doc.text(`Discount: Rs.${bill.totalDiscount.toFixed(2)}`, 140, finalY + 34);
-    doc.text(`Grand Total: Rs.${bill.grandTotal.toFixed(2)}`, 140, finalY + 40);
+    // Totals Table
+    const totals = [
+      ['Subtotal', `Rs.${bill.subtotal.toFixed(2)}`],
+      ['GST', `Rs.${bill.totalGst.toFixed(2)}`],
+      ['CGST', `Rs.${bill.totalCGst.toFixed(2)}`],
+      ['SGST', `Rs.${bill.totalSGst.toFixed(2)}`],
+      ['Discount', `Rs.${bill.totalDiscount.toFixed(2)}`],
+      ['Grand Total', `Rs.${bill.grandTotal.toFixed(2)}`]
+    ];
 
-    // --- Amount in Words
+    (doc as any).autoTable({
+      startY: finalY + 5,
+      head: [['Description', 'Amount']],
+      body: totals,
+      theme: 'grid',
+      styles: { fontSize: 10 },
+      tableWidth: 90,
+      startX: pageWidth - 100,
+    });
+
+    const afterTotalsY = (doc as any).lastAutoTable.finalY;
+
+    // Amount in Words box
+    doc.rect(12, afterTotalsY + 5, pageWidth - 24, 10);
     doc.setFontSize(10);
-    doc.text(`Amount in Words: INR ${convertToWords(bill.grandTotal)} Only`, 14, finalY + 45);
+    doc.text(`Amount in Words: INR ${convertToWords(bill.grandTotal)} Only`, 14, afterTotalsY + 12);
 
-    // --- Footer: Bank Details and Declaration
+    // Bank Details
+    const bankY = afterTotalsY + 25;
     doc.setFontSize(9);
-    doc.text('Bank Details:', 14, finalY + 60);
-    doc.text('TAMILNADU MERCANTILE BANK LTD', 14, finalY + 65);
-    doc.text('A/c No: 13215050801030', 14, finalY + 70);
-    doc.text('Branch & IFS: Sattur & TMBL0000132', 14, finalY + 75);
+    doc.text('Bank Details:', 14, bankY);
+    doc.text('TAMILNADU MERCANTILE BANK LTD', 14, bankY + 6);
+    doc.text('A/c No: 13215050801030', 14, bankY + 12);
+    doc.text('Branch & IFS: Sattur & TMBL0000132', 14, bankY + 18);
 
-    doc.text('Declaration:', 14, finalY + 85);
-    doc.text('We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.', 14, finalY + 90);
+    // Declaration box
+    doc.rect(12, bankY + 25, 150, 15);
+    doc.text('Declaration:', 14, bankY + 30);
+    doc.setFontSize(8);
+    doc.text('We declare that this invoice shows the actual price of the goods and all particulars are true and correct.', 14, bankY + 35);
 
-    doc.text('Authorised Signatory', 150, finalY + 95);
+    // Signature Box
+    doc.rect(pageWidth - 50, bankY + 25, 40, 20);
+    doc.setFontSize(9);
+    doc.text('Authorised Signatory', pageWidth - 48, bankY + 40);
 
-    // Save
-    doc.addPage();
+    if (billIndex !== selectedBills.length - 1) doc.addPage();
   });
 
   const now = format(new Date(), 'dd-MM-yyyy');

@@ -21,11 +21,12 @@ app.add_middleware(
 # Create product
 @app.post("/products/")
 def create_product(product: Product):
-    if product_collection.find_one({"id": product.id}):
-        raise HTTPException(status_code=400, detail="Product ID already exists")
-    
     product_dict = product.dict()
-    product_dict["code"] = get_next_product_code()
+    
+    # Auto unique product code generation
+    # if product_collection.find_one({"id": product.id}):
+    #     raise HTTPException(status_code=400, detail="Product ID already exists")
+    # product_dict["code"] = get_next_product_code()
 
     result = product_collection.insert_one(product_dict)
     return {"message": "Product created", "id": str(result.inserted_id), "code": product_dict["code"]}

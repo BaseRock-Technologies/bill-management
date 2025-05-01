@@ -21,9 +21,10 @@ export const useProductStore = create<ProductState>()(
 
       addProduct: async (product) => {
         const id = uuidv4();
-        const payload = { ...product, id, code: "0" }
+        const payload = { ...product, id }
         console.log(payload)
         try {
+        // const res = await fetch('http://127.0.0.1:8000/products/', {
         const res = await fetch('http://46.202.162.192:8000/products/', {
           method: "POST",
           headers: {
