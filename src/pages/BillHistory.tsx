@@ -38,6 +38,17 @@ const BillHistory = () => {
     }
   };
 
+  const [expandedBillIds, setExpandedBillIds] = useState<string[]>([]);
+
+  const toggleBillExpand = (billId: string) => {
+    setExpandedBillIds(prev =>
+      prev.includes(billId)
+        ? prev.filter(id => id !== billId)
+        : [...prev, billId]
+    );
+  };
+
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
@@ -87,7 +98,8 @@ const BillHistory = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {bills.map((bill) => (
-                    <tr key={bill.id} className="hover:bg-gray-50">
+                    <>
+                      <tr key={bill.id} className="hover:bg-gray-50" onClick={() => toggleBillExpand(bill.id)}>
                       <td className="px-4 py-4">
                         <input
                           type="checkbox"
@@ -111,6 +123,27 @@ const BillHistory = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalDiscount.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">₹{bill.grandTotal.toFixed(2)}</td>
                     </tr>
+                      {
+                        expandedBillIds.includes(bill.id) && (
+                          <tr className="bg-gray-50">
+                            <td colSpan={8} className="px-4 py-4">
+                              <div className="space-y-2">
+                                {bill.items.map((item, index) => (
+                                  <div key={index} className="flex gap-x-10 text-sm border-b py-1">
+                                    <span className='min-w-20'><strong>Code:</strong> {item.code}</span>
+                                    <span className='min-w-60'><strong>Name:</strong> {item.name}</span>
+                                    <span className='min-w-40'><strong>Price:</strong> ₹{item.price.toFixed(2)}</span>
+                                    <span className='min-w-40'><strong>GST:</strong> {item.gstPercentage}%</span>
+                                    <span className='min-w-20'><strong>Qty:</strong> {item.billQuantity + " " + (item.unit || '')}</span>
+                                    <span className='min-w-20'><strong>Total:</strong> ₹{(item.price * item.billQuantity) + (item.price * item.billQuantity * (item.gstPercentage || 0)) / 100}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      }
+                    </>
                   ))}
                 </tbody>
               </table>

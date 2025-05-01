@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 interface AuthState {
   isAuthenticated: boolean;
   username: string | null;
-  login: (username: string, password: string) => boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (username: string) => boolean;
   updatePassword: (currentPassword: string, newPassword: string) => boolean;
@@ -21,12 +21,29 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       username: null,
 
-      login: (username, password) => {
-        if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-          set({ isAuthenticated: true, username });
+      login: async (username, password) => {
+        try {
+          const response = await fetch("http://46.202.162.192:8000/login/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          if (!response.ok) {
+            return false; // login failed
+          }
+
+          const data = await response.json();
+
+          // If login is successful, store authentication state
+          set({ isAuthenticated: true, username }); // optionally store token too
           return true;
+        } catch (error) {
+          console.error("Login error:", error);
+          return false;
         }
-        return false;
       },
 
       logout: () => {
