@@ -65,8 +65,10 @@ export const exportToPDF = (selectedBills: Bill[]) => {
     // --- Totals and GST
     doc.text(`Subtotal: Rs.${bill.subtotal.toFixed(2)}`, 140, finalY + 10);
     doc.text(`GST: Rs.${bill.totalGst.toFixed(2)}`, 140, finalY + 16);
-    doc.text(`Discount: Rs.${bill.totalDiscount.toFixed(2)}`, 140, finalY + 22);
-    doc.text(`Grand Total: Rs.${bill.grandTotal.toFixed(2)}`, 140, finalY + 30);
+    doc.text(`CGST: Rs.${bill.totalCGst.toFixed(2)}`, 140, finalY + 22);
+    doc.text(`SGST: Rs.${bill.totalSGst.toFixed(2)}`, 140, finalY + 28);
+    doc.text(`Discount: Rs.${bill.totalDiscount.toFixed(2)}`, 140, finalY + 34);
+    doc.text(`Grand Total: Rs.${bill.grandTotal.toFixed(2)}`, 140, finalY + 40);
 
     // --- Amount in Words
     doc.setFontSize(10);
