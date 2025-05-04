@@ -5,10 +5,42 @@ import { useBillStore } from '../store/billStore';
 import Sidebar from '../components/Sidebar';
 import { printBills, exportToPDF, exportToWord } from '../utils/export';
 import { Bill } from '../types';
+import { Input } from '../components/ui/input';
 
 const BillHistory = () => {
   const { bills } = useBillStore();
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
+
+  // To address input model data
+  const [showModal, setShowModal] = useState(false);
+  
+  const [BuyerAddress, setBuyerAddress] = useState<string[]>(['', '', '', '', '']);
+  const sampleAddress = ['ABC TRADERS - KOVILPATTI', '2/3, Main Road, Nellai Main Road,', 'Kovilpatti - 628502',
+    'GSTIN / UIN: 33ABCDWFGH12345', 'State: Tamil Nadu, Code: 33'];
+  const [actionType, setActionType] = useState<'pdf' | 'word' | 'print' | null>(null);
+
+  const triggerAction = (type: 'pdf' | 'word' | 'print') => {
+    setActionType(type);
+    setShowModal(true);
+  };
+
+  const handleModalConfirm = async () => {
+    const billsToExport = bills.filter(bill =>
+      selectedBills.length === 0 || selectedBills.includes(bill.id)
+    );
+
+    if (actionType === 'pdf') {
+      exportToPDF(billsToExport, BuyerAddress); // Pass notes to PDF
+    } else if (actionType === 'word') {
+      await exportToWord(billsToExport, 'bills'); // Pass notes to Word
+    } else if (actionType === 'print') {
+      printBills(billsToExport, BuyerAddress); // Pass notes to Print
+    }
+
+    setShowModal(false);
+    setBuyerAddress(['', '', '', '', '']); // reset
+    setActionType(null);
+  };
 
   const handleSelectBill = (billId: string) => {
     setSelectedBills(prev => 
@@ -26,25 +58,26 @@ const BillHistory = () => {
     );
   };
 
-  const handleDownload = async (type: 'pdf' | 'word') => {
-    const billsToExport = bills.filter(bill => 
-      selectedBills.length === 0 || selectedBills.includes(bill.id)
-    );
+  // Obselete code for download and print buttons
+  // const handleDownload = async (type: 'pdf' | 'word') => {
+  //   const billsToExport = bills.filter(bill => 
+  //     selectedBills.length === 0 || selectedBills.includes(bill.id)
+  //   );
 
-    if (type === 'pdf') {
-      exportToPDF(billsToExport);
-    } else {
-      await exportToWord(billsToExport, 'bills');
-    }
-  };
+  //   if (type === 'pdf') {
+  //     exportToPDF(billsToExport);
+  //   } else {
+  //     await exportToWord(billsToExport, 'bills');
+  //   }
+  // };
 
-  const handlePrint = async () => {
-    const billsToExport = bills.filter(bill =>
-      selectedBills.length === 0 || selectedBills.includes(bill.id)
-    );
+  // const handlePrint = async () => {
+  //   const billsToExport = bills.filter(bill =>
+  //     selectedBills.length === 0 || selectedBills.includes(bill.id)
+  //   );
 
-    printBills(billsToExport);
-  };
+  //   printBills(billsToExport);
+  // };
 
   const [expandedBillIds, setExpandedBillIds] = useState<string[]>([]);
 
@@ -56,9 +89,12 @@ const BillHistory = () => {
     );
   };
 
+  
+
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+
       <Sidebar />
       <div className="flex-1 p-4 md:p-8 pt-20 md:pt-8 md:ml-64">
         <div className="max-w-7xl mx-auto">
@@ -66,21 +102,21 @@ const BillHistory = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Billing History</h1>
             <div className="flex gap-2">
               <button
-                onClick={() => handleDownload('pdf')}
+                onClick={() => triggerAction('pdf')}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 <FilePdf className="w-4 h-4" />
                 Export PDF
               </button>
               <button
-                onClick={() => handleDownload('word')}
+                onClick={() => triggerAction('word')}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <FileWord className="w-4 h-4" />
                 Export Word
               </button>
               <button
-                onClick={() => handlePrint()}
+                onClick={() => triggerAction('print')}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 <FilePdf className="w-4 h-4" />
@@ -210,6 +246,30 @@ const BillHistory = () => {
             </div>
           </div>
         </div>
+
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
+              <h2>Enter Buyer Info (5 Lines)</h2>
+              {BuyerAddress.map((line, i) => (
+                <Input
+                  className='h-10 text-md'
+                  key={i}
+                  type="text"
+                  value={line}
+                  onChange={(e) => {
+                    const updated = [...BuyerAddress];
+                    updated[i] = e.target.value;
+                    setBuyerAddress(updated);
+                  }}
+                  placeholder={sampleAddress[i]}
+                />
+              ))}
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" onClick={handleModalConfirm}>Continue</button>
+              <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" onClick={() => setShowModal(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

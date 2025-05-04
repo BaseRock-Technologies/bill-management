@@ -9,7 +9,7 @@ import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 
 // Assuming Bill and Product types are already defined
-export const exportToPDF = (selectedBills: Bill[]) => {
+export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
   const doc = new jsPDF();
 
   selectedBills.forEach((bill, billIndex) => {
@@ -42,13 +42,11 @@ export const exportToPDF = (selectedBills: Bill[]) => {
 
     // Buyer Info box
     doc.setFontSize(11);
-    doc.text('From:', 14, 52);
+    doc.text('Buyer:', 14, 52);
     doc.setFontSize(10);
-    doc.text('M.A.S TRADERS - KOVILPATTI', 14, 57);
-    doc.text('6/278-5, Main Road, Nellai Main Road,', 14, 62);
-    doc.text('Kovilpatti - 628502', 14, 67);
-    doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 72);
-    doc.text('State: Tamil Nadu, Code: 33', 14, 77);
+    BuyerAddress.slice(0, 5).forEach((line, i) => {
+      doc.text(line || ' ', 14, 57 + i * 5); // 5pt spacing between lines
+    });
     doc.rect(12, 48, 90, 35); // Buyer info border
 
    // Combined Product + Totals Table
@@ -165,7 +163,7 @@ export const convertToWords = (amount: number): string => {
 };
 
 
-export const printBills = (selectedBills: Bill[]) => {
+export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
   const newWindow = window.open('', '_blank');
   if (!newWindow) return;
 
@@ -249,6 +247,7 @@ export const printBills = (selectedBills: Bill[]) => {
         <td colspan="6">Grand Total</td>
         <td>Rs.${bill.grandTotal.toFixed(2)}</td>
       </tr>`;
+    const buyerHTML = BuyerAddress.slice(0, 5).map(line => `${line || '&nbsp;'}`).join('<br/>');
 
     return `
       <div class="invoice">
@@ -265,11 +264,7 @@ export const printBills = (selectedBills: Bill[]) => {
 
             <div class="section-box">
               <strong>Buyer:</strong><br/>
-              M.A.S TRADERS - KOVILPATTI<br/>
-              6/278-5, Main Road, Nellai Main Road,<br/>
-              Kovilpatti - 628502<br/>
-              GSTIN/UIN: 33AVMPM1750G1ZO<br/>
-              State: Tamil Nadu, Code: 33
+             <div class="buyer-info">${ buyerHTML }</div>
             </div>
           </div>
 
@@ -330,8 +325,6 @@ export const printBills = (selectedBills: Bill[]) => {
   newWindow.focus();
   newWindow.print();
 };
-
-
 
 // PDF Exports
 // Exporting bills are obselete. Only use it for products export

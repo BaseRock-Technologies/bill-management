@@ -10,8 +10,8 @@ interface BillState {
 }
 
 
-const backendURL = 'http://localhost:8000';
-// const backendURL = 'http://46.202.162.192:8000';
+// const backendURL = 'http://localhost:8000';
+const backendURL = 'http://46.202.162.192:8000';
 
 export const useBillStore = create<BillState>()(
   persist(

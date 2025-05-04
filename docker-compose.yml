@@ -6,7 +6,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_BACKEND_URL=http://localhost:8000
+      - VITE_BACKEND_URL=http://46.202.162.192:8000
     volumes:
       - ./src:/app/src
       - ./index.html:/app/index.html
