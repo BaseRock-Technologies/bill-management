@@ -20,6 +20,9 @@ export const exportToPDF = (selectedBills: Bill[]) => {
     doc.setDrawColor(0);
     doc.rect(margin, margin, pageWidth - 2 * margin, 270);
 
+    doc.setFontSize(12);
+    doc.text('Tax Invoice', 100, 7);
+
     // Seller Details box
     doc.setFontSize(12);
     doc.text('SIVARAM TRADERS', 14, 20);
@@ -31,13 +34,11 @@ export const exportToPDF = (selectedBills: Bill[]) => {
     doc.rect(12, 15, 90, 30); // Seller info border
 
     // Invoice Info box
-    doc.setFontSize(12);
-    doc.text('Tax Invoice', 150, 20);
     doc.setFontSize(10);
-    doc.text(`Invoice No: ${bill.id.slice(0, 8)}`, 150, 26);
-    doc.text(`Date: ${format(new Date(bill.timestamp), 'dd-MMM-yyyy')}`, 150, 31);
-    doc.text('Mode/Terms: 10 Days Credit', 150, 36);
-    doc.rect(140, 15, 60, 30); // Invoice info border
+    doc.text(`Invoice No: ${bill.id.slice(0, 8)}`, 107, 20);
+    doc.text(`Date: ${format(new Date(bill.timestamp), 'dd-MMM-yyyy')}`, 107, 25);
+    doc.text('Mode/Terms: 10 Days Credit', 107, 30);
+    doc.rect(105, 15, 92, 67); // Invoice info border
 
     // Buyer Info box
     doc.setFontSize(11);
@@ -48,10 +49,14 @@ export const exportToPDF = (selectedBills: Bill[]) => {
     doc.text('Kovilpatti - 628502', 14, 67);
     doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 72);
     doc.text('State: Tamil Nadu, Code: 33', 14, 77);
-    doc.rect(12, 48, 188, 35); // Buyer info border
+    doc.rect(12, 48, 90, 35); // Buyer info border
 
-    // Products Table
-    const itemRows = bill.items.map((item, index) => ([
+   // Combined Product + Totals Table
+  const combinedRows: any[] = [];
+
+  // Add product rows
+  bill.items.forEach((item, index) => {
+    combinedRows.push([
       index + 1,
       item.name,
       item.code || '',
@@ -59,38 +64,44 @@ export const exportToPDF = (selectedBills: Bill[]) => {
       `${item.billQuantity} ${item.unit || 'Units'}`,
       `Rs.${item.price.toFixed(2)}`,
       `Rs.${(item.billQuantity * item.price).toFixed(2)}`
-    ]));
+    ]);
+  });
 
-    (doc as any).autoTable({
-      head: [['Sl', 'Product Name', 'HSN/SAC', 'GST Rate', 'Quantity', 'Rate', 'Amount']],
-      body: itemRows,
-      startY: 88,
-      theme: 'grid',
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [200, 200, 200] }
-    });
+  // Add summary total rows (bold)
+  const summaryRows = [
+    ['Subtotal', bill.subtotal],
+    ['GST', bill.totalGst],
+    ['CGST', bill.totalCGst],
+    ['SGST', bill.totalSGst],
+    ['Discount', bill.totalDiscount]
+  ];
 
-    const finalY = (doc as any).lastAutoTable.finalY;
+  summaryRows.forEach(([label, value]) => {
+    combinedRows.push([
+      '', { content: label, styles: { fontStyle: 'bold' } }, '', '', '', '',
+      { content: `Rs.${(+value).toFixed(2)}`, styles: { fontStyle: 'bold' } }
+    ]);
+  });
 
-    // Totals Table
-    const totals = [
-      ['Subtotal', `Rs.${bill.subtotal.toFixed(2)}`],
-      ['GST', `Rs.${bill.totalGst.toFixed(2)}`],
-      ['CGST', `Rs.${bill.totalCGst.toFixed(2)}`],
-      ['SGST', `Rs.${bill.totalSGst.toFixed(2)}`],
-      ['Discount', `Rs.${bill.totalDiscount.toFixed(2)}`],
-      ['Grand Total', `Rs.${bill.grandTotal.toFixed(2)}`]
-    ];
+  // Add Grand Total row with top and bottom border
+  combinedRows.push([
+    { content: '', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: 'Grand Total', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: '', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: '', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: '', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: '', styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } },
+    { content: `Rs.${bill.grandTotal.toFixed(2)}`, styles: { fontStyle: 'bold', lineWidth: 0.2, lineColor: [0, 0, 0], lineTop: 0.2, lineBottom: 0.2 } }
+  ]);
 
-    (doc as any).autoTable({
-      startY: finalY + 5,
-      head: [['Description', 'Amount']],
-      body: totals,
-      theme: 'grid',
-      styles: { fontSize: 10 },
-      tableWidth: 90,
-      startX: pageWidth - 100,
-    });
+  (doc as any).autoTable({
+    head: [['Sl', 'Product Name', 'HSN/SAC', 'GST Rate', 'Quantity', 'Rate', 'Amount']],
+    body: combinedRows,
+    startY: 88,
+    theme: 'grid',
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [150, 150, 150] }
+  });
 
     const afterTotalsY = (doc as any).lastAutoTable.finalY;
 
@@ -101,22 +112,27 @@ export const exportToPDF = (selectedBills: Bill[]) => {
 
     // Bank Details
     const bankY = afterTotalsY + 25;
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.text('Bank Details:', 14, bankY);
+    doc.setFontSize(9);
     doc.text('TAMILNADU MERCANTILE BANK LTD', 14, bankY + 6);
     doc.text('A/c No: 13215050801030', 14, bankY + 12);
     doc.text('Branch & IFS: Sattur & TMBL0000132', 14, bankY + 18);
 
     // Declaration box
-    doc.rect(12, bankY + 25, 150, 15);
+    doc.rect(12, bankY + 25, 182, 15);
     doc.text('Declaration:', 14, bankY + 30);
-    doc.setFontSize(8);
+    doc.setFontSize(10);
     doc.text('We declare that this invoice shows the actual price of the goods and all particulars are true and correct.', 14, bankY + 35);
 
     // Signature Box
-    doc.rect(pageWidth - 50, bankY + 25, 40, 20);
+    doc.rect(12, bankY + 40, 92, 20);
     doc.setFontSize(9);
-    doc.text('Authorised Signatory', pageWidth - 48, bankY + 40);
+    doc.text('Customer Seal or Signatory', 14, bankY + 45);
+
+    doc.rect(105, bankY + 40, 90, 20);
+    doc.setFontSize(9);
+    doc.text('Authorised Signatory', 107, bankY + 45);
 
     if (billIndex !== selectedBills.length - 1) doc.addPage();
   });
@@ -127,59 +143,245 @@ export const exportToPDF = (selectedBills: Bill[]) => {
 };
 
 // Helper to convert numbers to words (simple version)
-const convertToWords = (amount: number) => {
-  // You can plug in a full converter here for large amounts.
+export const convertToWords = (amount: number): string => {
+  const ones = [
+    '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+    'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
+    'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+  ];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  const numToWords = (num: number): string => {
+    if (num < 20) return ones[num];
+    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? ' ' + ones[num % 10] : '');
+    if (num < 1000) return ones[Math.floor(num / 100)] + ' Hundred' + (num % 100 !== 0 ? ' and ' + numToWords(num % 100) : '');
+    if (num < 100000) return numToWords(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 !== 0 ? ' ' + numToWords(num % 1000) : '');
+    if (num < 10000000) return numToWords(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 !== 0 ? ' ' + numToWords(num % 100000) : '');
+    return numToWords(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 !== 0 ? ' ' + numToWords(num % 10000000) : '');
+  };
+
   const rounded = Math.round(amount);
-  return rounded.toString(); // replace this with a real number-to-words library if needed
+  return numToWords(rounded) + ' Rupees';
 };
 
-// // PDF Exports
-// export const exportToPDF = (data: any[], type: 'bills' | 'products') => {
-//   const doc = new jsPDF();
+
+export const printBills = (selectedBills: Bill[]) => {
+  const newWindow = window.open('', '_blank');
+  if (!newWindow) return;
+
+  const styles = `
+    <style>
+      @media print {
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+        }
+        .invoice {
+          width: 100%;
+          padding: 20px;
+          box-sizing: border-box;
+          page-break-after: always;
+          border: 1px solid #000;
+        }
+        .section-box {
+          border: 1px solid #000;
+          padding: 8px;
+          margin-top: 10px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        th, td {
+          border: 1px solid #000;
+          padding: 4px 6px;
+          font-size: 12px;
+        }
+        th {
+          background: #eee;
+        }
+        .bold {
+          font-weight: bold;
+        }
+        .flex {
+          display:flex;
+          gap: 5px;
+        }
+        .grand-total td {
+          border-top: 2px solid #000 !important;
+          border-bottom: 2px solid #000 !important;
+          font-weight: bold;
+        }
+      }
+    </style>
+  `;
+
+  const content = selectedBills.map((bill) => {
+    const itemRows = bill.items.map(
+      (item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.code || ''}</td>
+          <td>${item.gstPercentage || 18}%</td>
+          <td>${item.billQuantity} ${item.unit || 'Units'}</td>
+          <td>Rs.${item.price.toFixed(2)}</td>
+          <td>Rs.${(item.billQuantity * item.price).toFixed(2)}</td>
+        </tr>`
+    ).join('');
+
+    const summaryRows = [
+      ['Subtotal', bill.subtotal],
+      ['GST', bill.totalGst],
+      ['CGST', bill.totalCGst],
+      ['SGST', bill.totalSGst],
+      ['Discount', bill.totalDiscount],
+    ].map(([label, value]) => `
+        <tr class="bold">
+          <td colspan="6">${label}</td>
+          <td>Rs.${(+value).toFixed(2)}</td>
+        </tr>`
+    ).join('');
+
+    const grandTotalRow = `
+      <tr class="grand-total">
+        <td colspan="6">Grand Total</td>
+        <td>Rs.${bill.grandTotal.toFixed(2)}</td>
+      </tr>`;
+
+    return `
+      <div class="invoice">
+        <h2 style="text-align:center;">TAX INVOICE</h2>
+        <div class="flex">
+          <div style="width: 60%;">
+            <div class="section-box">
+              <strong>SIVARAM TRADERS</strong><br/>
+              629/A Bypass Road, Sattur-626203<br/>
+              Ph: 9600662773<br/>
+              GSTIN/UIN: 33CEPS9062G1ZL<br/>
+              State: Tamil Nadu, Code: 33
+            </div>
+
+            <div class="section-box">
+              <strong>Buyer:</strong><br/>
+              M.A.S TRADERS - KOVILPATTI<br/>
+              6/278-5, Main Road, Nellai Main Road,<br/>
+              Kovilpatti - 628502<br/>
+              GSTIN/UIN: 33AVMPM1750G1ZO<br/>
+              State: Tamil Nadu, Code: 33
+            </div>
+          </div>
+
+          <div class="section-box" style="width: 40%;">
+            <strong>Invoice No:</strong> ${bill.id.slice(0, 8)}<br/>
+            <strong>Date:</strong> ${format(new Date(bill.timestamp), 'dd-MMM-yyyy')}<br/>
+            <strong>Mode/Terms:</strong> 10 Days Credit
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Sl</th>
+              <th>Product Name</th>
+              <th>HSN/SAC</th>
+              <th>GST Rate</th>
+              <th>Quantity</th>
+              <th>Rate</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemRows}
+            ${summaryRows}
+            ${grandTotalRow}
+          </tbody>
+        </table>
+
+        <div class="section-box">
+          <strong>Amount in Words:</strong> INR ${convertToWords(bill.grandTotal)} Only
+        </div>
+
+        <div class="section-box">
+          <strong>Bank Details:</strong><br/>
+          TAMILNADU MERCANTILE BANK LTD<br/>
+          A/c No: 13215050801030<br/>
+          Branch & IFS: Sattur & TMBL0000132
+        </div>
+
+        <div class="section-box">
+          <strong>Declaration:</strong><br/>
+          We declare that this invoice shows the actual price of the goods and all particulars are true and correct.
+        </div>
+
+        <table style="margin-top: 10px;">
+          <tr>
+            <td style="height: 70px;"><strong>Customer Sign/Seal</strong></td>
+            <td style="text-align: right;"><strong>Authorised Signatory</strong></td>
+          </tr>
+        </table>
+      </div>
+    `;
+  }).join('');
+
+  newWindow.document.write(`<html><head><title>Print Bills</title>${styles}</head><body>${content}</body></html>`);
+  newWindow.document.close();
+  newWindow.focus();
+  newWindow.print();
+};
+
+
+
+// PDF Exports
+// Exporting bills are obselete. Only use it for products export
+export const exportProductsToPDF = (data: any[], type: 'bills' | 'products') => {
+  const doc = new jsPDF();
   
-//   if (type === 'bills') {
-//     doc.text('Bill History', 14, 15);
-//     const billRows = data.map((bill: Bill) => {
-//     const itemDetails = bill.items.map(item =>
-//       `${item.name} (x${item.billQuantity}) - Rs.${item.price}`
-//     ).join('\n');
+  if (type === 'bills') {
+    doc.text('Bill History', 14, 15);
+    const billRows = data.map((bill: Bill) => {
+    const itemDetails = bill.items.map(item =>
+      `${item.name} (x${item.billQuantity}) - Rs.${item.price}`
+    ).join('\n');
 
-//     return [
-//       bill.id.slice(0, 8),
-//       format(new Date(bill.timestamp), 'dd/MM/yyyy HH:mm'),
-//       itemDetails,
-//       `Rs.${bill.subtotal.toFixed(2)}`,
-//       `Rs.${bill.totalGst.toFixed(2)}`,
-//       `Rs.${bill.totalDiscount.toFixed(2)}`,
-//       `Rs.${bill.grandTotal.toFixed(2)}`
-//     ];
-//   });
+    return [
+      bill.id.slice(0, 8),
+      format(new Date(bill.timestamp), 'dd/MM/yyyy HH:mm'),
+      itemDetails,
+      `Rs.${bill.subtotal.toFixed(2)}`,
+      `Rs.${bill.totalGst.toFixed(2)}`,
+      `Rs.${bill.totalDiscount.toFixed(2)}`,
+      `Rs.${bill.grandTotal.toFixed(2)}`
+    ];
+  });
 
 
-//     (doc as any).autoTable({
-//       head: [['Bill ID', 'Date', 'Items (Name xQty - Price)', 'Subtotal', 'GST', 'Discount', 'Total']],
-//       body: billRows,
-//       startY: 20,
-//     });
-//   } else {
-//     doc.text('Products List', 14, 15);
-//     const productRows = data.map((product: Product) => [
-//       product.id,
-//       product.name,
-//       `Rs.${product.price}`,
-//       product.quantity?.toString() || '0',
-//       `${product.gstPercentage}%`
-//     ]);
+    (doc as any).autoTable({
+      head: [['Bill ID', 'Date', 'Items (Name xQty - Price)', 'Subtotal', 'GST', 'Discount', 'Total']],
+      body: billRows,
+      startY: 20,
+    });
+  } else {
+    doc.text('Products List', 14, 15);
+    const productRows = data.map((product: Product) => [
+      product.code,
+      product.name,
+      `Rs.${product.price}`,
+      product.unit?.toString() || 'Units',
+      product.quantity?.toString() || '0',
+      `${product.gstPercentage}%`
+    ]);
 
-//     (doc as any).autoTable({
-//       head: [['Product ID', 'Name', 'Price', 'Quantity', 'GST %']],
-//       body: productRows,
-//       startY: 20,
-//     });
-//   }
+    (doc as any).autoTable({
+      head: [['Product Code', 'Name', 'Price', 'Quantity', 'Unit', 'GST %']],
+      body: productRows,
+      startY: 20,
+    });
+  }
 
-//   doc.save(`${type}-${format(new Date(), 'dd-MM-yyyy')}.pdf`);
-// };
+  doc.save(`${type}-${format(new Date(), 'dd-MM-yyyy')}.pdf`);
+};
 
 // Word Exports
 export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
@@ -198,7 +400,7 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                 ? ['Bill ID', 'Date', 'Items', 'Subtotal', 'GST', 'Discount', 'Total'].map(
                     header => new TableCell({ children: [new Paragraph({ text: header })] })
                   )
-                : ['Product ID', 'Name', 'Price', 'Quantity', 'GST %'].map(
+                : ['Code', 'Name', 'Price', 'Quantity', 'Unit', 'GST %'].map(
                     header => new TableCell({ children: [new Paragraph({ text: header })] })
                   ),
             }),
@@ -208,17 +410,18 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                   ? [
                       item.id.slice(0, 8),
                       format(new Date(item.timestamp), 'dd/MM/yyyy HH:mm'),
-                      item.items.map(i => `${i.name} (x${i.billQuantity}) - Rs.${i.price}`).join(', '),
+                      item.items.map((i:any) => `${i.name} (x${i.billQuantity}) - Rs.${i.price}`).join(', '),
                       `Rs.${item.subtotal.toFixed(2)}`,
                       `Rs.${item.totalGst.toFixed(2)}`,
                       `Rs.${item.totalDiscount.toFixed(2)}`,
                       `Rs.${item.grandTotal.toFixed(2)}`
                     ].map(cell => new TableCell({ children: [new Paragraph({ text: cell })] }))
                   : [
-                      item.product_id,
+                      item.code,
                       item.name,
                       `Rs.${item.price}`,
                       item.quantity?.toString() || '0',
+                      item.unit?.toString() || 'Units',
                       `${item.gstPercentage}%`
                     ].map(cell => new TableCell({ children: [new Paragraph({ text: cell })] }))
               })

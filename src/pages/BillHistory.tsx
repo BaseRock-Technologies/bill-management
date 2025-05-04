@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ChevronRight, FileText, Download, WholeWord as FileWord, File as FilePdf } from 'lucide-react';
 import { useBillStore } from '../store/billStore';
 import Sidebar from '../components/Sidebar';
-import { exportToPDF, exportToWord } from '../utils/export';
+import { printBills, exportToPDF, exportToWord } from '../utils/export';
 import { Bill } from '../types';
 
 const BillHistory = () => {
@@ -32,10 +32,18 @@ const BillHistory = () => {
     );
 
     if (type === 'pdf') {
-      exportToPDF(billsToExport, 'bills');
+      exportToPDF(billsToExport);
     } else {
       await exportToWord(billsToExport, 'bills');
     }
+  };
+
+  const handlePrint = async () => {
+    const billsToExport = bills.filter(bill =>
+      selectedBills.length === 0 || selectedBills.includes(bill.id)
+    );
+
+    printBills(billsToExport);
   };
 
   const [expandedBillIds, setExpandedBillIds] = useState<string[]>([]);
@@ -70,6 +78,13 @@ const BillHistory = () => {
               >
                 <FileWord className="w-4 h-4" />
                 Export Word
+              </button>
+              <button
+                onClick={() => handlePrint()}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                <FilePdf className="w-4 h-4" />
+                Print Bill
               </button>
             </div>
           </div>

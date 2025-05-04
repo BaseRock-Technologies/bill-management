@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import { useProductStore } from '../store/productStore';
 import { Product } from '../types';
 import { Input } from '../components/ui/input';
-import { exportToPDF, exportToWord } from '../utils/export';
+import { exportProductsToPDF, exportToWord } from '../utils/export';
 
 const Products = () => {
   const { products, addProduct, updateProduct, deleteProduct, bulkAddProducts, clearAllProducts, loadProducts } = useProductStore();
@@ -22,10 +22,15 @@ const Products = () => {
     gstPercentage: ''
   });
 
+
+  const backendURL = 'http://localhost:8000';
+  // const backendURL = 'http://46.202.162.192:8000';
+
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("fetchProducts")
       try {
-        const res = await fetch('http://46.202.162.192:8000/all_products/');
+        const res = await fetch(backendURL + '/all_products/');
         const data = await res.json();
 
         clearAllProducts(); // Clear existing products
@@ -96,7 +101,7 @@ const Products = () => {
     );
 
     if (type === 'pdf') {
-      exportToPDF(productsToExport, 'products');
+      exportProductsToPDF(productsToExport, 'products');
     } else {
       await exportToWord(productsToExport, 'products');
     }
@@ -111,12 +116,14 @@ const Products = () => {
       skipEmptyLines: true,
       complete: (results) => {
         const products = results.data.map((row: any) => ({
+          code: row.code,
           name: row.name,
           price: Number(row.price),
           quantity: Number(row.quantity),
           unit: row.unit,
           gstPercentage: Number(row.gstPercentage)
         }));
+        console.log(products)
         bulkAddProducts(products);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -129,7 +136,7 @@ const Products = () => {
   };
 
   const handleDownloadTemplate = () => {
-    const csvContent = "name,price,quantity,unit,gstPercentage\nSample Product,100,10,units,18";
+    const csvContent = "code,name,price,quantity,unit,gstPercentage\nHSN001,Sample Product,100,10,units,18";
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);

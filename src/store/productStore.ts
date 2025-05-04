@@ -9,10 +9,13 @@ interface ProductState {
   updateProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
   getProductByCode: (code: string) => Product | undefined;
-  bulkAddProducts: (products: Omit<Product, 'id' | 'code'>[]) => void;
+  bulkAddProducts: (products: Omit<Product, 'id'>[]) => void;
   clearAllProducts: () => void;
   loadProducts: (products: Product[]) => void;
 }
+
+const backendURL = 'http://localhost:8000';
+// const backendURL = 'http://46.202.162.192:8000';
 
 export const useProductStore = create<ProductState>()(
   persist(
@@ -24,8 +27,7 @@ export const useProductStore = create<ProductState>()(
         const payload = { ...product, id }
         console.log(payload)
         try {
-        // const res = await fetch('http://127.0.0.1:8000/products/', {
-        const res = await fetch('http://46.202.162.192:8000/products/', {
+        const res = await fetch(backendURL + '/products/', {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -59,7 +61,7 @@ export const useProductStore = create<ProductState>()(
         }));
 
         try {
-          const res = await fetch(`http://46.202.162.192:8000/products/${updatedProduct.id}`, {
+          const res = await fetch(backendURL + `/products/${updatedProduct.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -85,7 +87,7 @@ export const useProductStore = create<ProductState>()(
           products: state.products.filter((product) => product.id !== id)
         }))
          try {
-          const res = await fetch(`http://46.202.162.192:8000/products/${id}`, {
+          const res = await fetch(backendURL + `/products/${id}`, {
             method: "DELETE",
           });
 
@@ -113,12 +115,11 @@ export const useProductStore = create<ProductState>()(
         for (const product of newProducts) {
           const payload = {
             ...product,
-            id: uuidv4(),
-            code: `0`
+            id: uuidv4()
           };
 
           try {
-            const res = await fetch('http://46.202.162.192:8000/products/', {
+            const res = await fetch(backendURL + '/products/', {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
