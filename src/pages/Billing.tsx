@@ -61,13 +61,13 @@ const Billing = () => {
 
   const calculateTotals = () => {
     const subtotal = selectedProducts.reduce((acc, item) => acc + item.total, 0);
-    const totalGst = selectedProducts.reduce((acc, item) => acc + item.gstAmount, 0);
+    // const totalGst = selectedProducts.reduce((acc, item) => acc + item.gstAmount, 0);
     const totalCGst = (subtotal * (CGstPercentage || 0)) / 100;
     const totalSGst = (subtotal * (SGstPercentage || 0)) / 100;
     const totalDiscount = selectedProducts.reduce((acc, item) => acc + (item.discount || 0), 0);
-    const grandTotal = subtotal + totalGst + totalCGst + totalSGst - totalDiscount;
+    const grandTotal = subtotal + totalCGst + totalSGst - totalDiscount;
 
-    return { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal };
+    return { subtotal, totalCGst, totalSGst, totalDiscount, grandTotal };
   };
 
   const handleCreateBill = () => {
@@ -82,7 +82,7 @@ const Billing = () => {
     setSelectedProducts([]);
   };
 
-  const { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal } = calculateTotals();
+  const { subtotal, totalCGst, totalSGst, totalDiscount, grandTotal } = calculateTotals();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -229,10 +229,10 @@ const Billing = () => {
                         <span className="text-gray-600">Subtotal:</span>
                         <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="text-gray-600">GST:</span>
                         <span className="font-medium">₹{totalGst.toFixed(2)}</span>
-                      </div>
+                      </div> */}
                       <div className="flex justify-between">
                         <span className="text-gray-600">CGST:</span>
                         <span className="font-medium">₹{totalCGst.toFixed(2)}</span>

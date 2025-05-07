@@ -142,7 +142,9 @@ const BillHistory = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST</th>
+                    {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GST</th> */}
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total CGST (₹)</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total SGST (₹)</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount (₹)</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   </tr>
@@ -170,8 +172,10 @@ const BillHistory = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{bill.items.length}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.subtotal.toFixed(2)}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst.toFixed(2)}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalDiscount.toFixed(2)}</td>
+                      {/* <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst.toFixed(2)}</td> */}
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalCGst.toFixed(2)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalSGst.toFixed(2)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">- ₹{bill.totalDiscount.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">₹{bill.grandTotal.toFixed(2)}</td>
                     </tr>
                       {
@@ -184,9 +188,9 @@ const BillHistory = () => {
                                     <span className='min-w-20'><strong>Code:</strong> {item.code}</span>
                                     <span className='min-w-60'><strong>Name:</strong> {item.name}</span>
                                     <span className='min-w-40'><strong>Price:</strong> ₹{item.price.toFixed(2)}</span>
-                                    <span className='min-w-40'><strong>GST:</strong> {item.gstPercentage}%</span>
+                                    {/* <span className='min-w-40'><strong>GST:</strong> {item.gstPercentage}%</span> */}
                                     <span className='min-w-20'><strong>Qty:</strong> {item.billQuantity + " " + (item.unit || '')}</span>
-                                    <span className='min-w-20'><strong>Total:</strong> ₹{(item.price * item.billQuantity) + (item.price * item.billQuantity * (item.gstPercentage || 0)) / 100}</span>
+                                    <span className='min-w-20'><strong>Total:</strong> ₹{bill.grandTotal.toFixed(2)}</span>
                                   </div>
                                 ))}
                               </div>
@@ -228,10 +232,10 @@ const BillHistory = () => {
                       <span className="text-sm text-gray-500">Subtotal:</span>
                       <span className="text-sm">₹{bill.subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                       <span className="text-sm text-gray-500">GST:</span>
                       <span className="text-sm">₹{bill.totalGst.toFixed(2)}</span>
-                    </div>
+                    </div> */}
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Discount:</span>
                       <span className="text-sm">₹{bill.totalDiscount.toFixed(2)}</span>

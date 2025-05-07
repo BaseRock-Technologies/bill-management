@@ -26,7 +26,7 @@ export interface Bill {
   items: BillItem[];
   timestamp: Date;
   subtotal: number;
-  totalGst: number;
+  // totalGst: number;
   totalCGst: number;
   totalSGst: number;
   totalDiscount: number;
