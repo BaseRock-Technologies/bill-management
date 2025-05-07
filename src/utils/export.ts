@@ -25,11 +25,11 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
 
     // Seller Details box
     doc.setFontSize(12);
-    doc.text('SIVARAM TRADERS', 14, 20);
+    doc.text('M.A.S. TRADERS', 14, 20);
     doc.setFontSize(10);
-    doc.text('629/A Bypass Road, Sattur-626203', 14, 26);
-    doc.text('Ph: 9600662773', 14, 31);
-    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 36);
+    doc.text('NO.1C2 NEAR RAJMAHAL KALAYANA MANDAPAM,', 14, 26);
+    doc.text('PARK EAST STREET, KOVILPATTI 628502.', 14, 31);
+    doc.text('GSTIN/UIN:  33AVMPM1750G1ZO', 14, 36);
     doc.text('State: Tamil Nadu, Code: 33', 14, 41);
     doc.rect(12, 15, 90, 30); // Seller info border
 
@@ -68,16 +68,21 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
   // Add summary total rows (bold)
   const summaryRows = [
     ['Subtotal', bill.subtotal],
-    ['GST', bill.totalGst],
+    // ['GST', bill.totalGst],
     ['CGST', bill.totalCGst],
     ['SGST', bill.totalSGst],
     ['Discount', bill.totalDiscount]
   ];
 
   summaryRows.forEach(([label, value]) => {
+    const isDiscount = String(label).toLowerCase() === 'discount';
+    const formattedValue = `${isDiscount ? '-' : ''} Rs.${(+value).toFixed(2)}`;
+  
     combinedRows.push([
-      '', { content: label, styles: { fontStyle: 'bold' } }, '', '', '', '',
-      { content: `Rs.${(+value).toFixed(2)}`, styles: { fontStyle: 'bold' } }
+      '',
+      { content: label, styles: { fontStyle: 'bold' } },
+      '', '', '', '',
+      { content: formattedValue, styles: { fontStyle: 'bold' } }
     ]);
   });
 
@@ -98,7 +103,10 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
     startY: 88,
     theme: 'grid',
     styles: { fontSize: 9 },
-    headStyles: { fillColor: [150, 150, 150] }
+    headStyles: { fillColor: [150, 150, 150] },
+    columnStyles: {
+      6: { halign: 'right' } // Align the "Amount" column (index 6) to the right
+    }
   });
 
     const afterTotalsY = (doc as any).lastAutoTable.finalY;
@@ -113,9 +121,9 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
     doc.setFontSize(10);
     doc.text('Bank Details:', 14, bankY);
     doc.setFontSize(9);
-    doc.text('TAMILNADU MERCANTILE BANK LTD', 14, bankY + 6);
-    doc.text('A/c No: 13215050801030', 14, bankY + 12);
-    doc.text('Branch & IFS: Sattur & TMBL0000132', 14, bankY + 18);
+    doc.text('HDFC Bank', 14, bankY + 6);
+    doc.text('A/c No: 50200055286191', 14, bankY + 12);
+    doc.text('Branch & IFSC: Kovilpatti & HDFC0002021', 14, bankY + 18);
 
     // Declaration box
     doc.rect(12, bankY + 25, 182, 15);
@@ -231,7 +239,7 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
 
     const summaryRows = [
       ['Subtotal', bill.subtotal],
-      ['GST', bill.totalGst],
+      // ['GST', bill.totalGst],
       ['CGST', bill.totalCGst],
       ['SGST', bill.totalSGst],
       ['Discount', bill.totalDiscount],
@@ -255,10 +263,11 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
         <div class="flex">
           <div style="width: 60%;">
             <div class="section-box">
-              <strong>SIVARAM TRADERS</strong><br/>
-              629/A Bypass Road, Sattur-626203<br/>
-              Ph: 9600662773<br/>
-              GSTIN/UIN: 33CEPS9062G1ZL<br/>
+              <strong>M.A.S. TRADERS</strong><br/>
+              NO.1C2 NEAR RAJMAHAL KALAYANA MANDAPAM,<br/>
+              PARK EAST STREET,<br/>
+              KOVILPATTI 628502.<br/>
+              GSTIN/UIN:  33AVMPM1750G1ZO<br/>
               State: Tamil Nadu, Code: 33
             </div>
 
@@ -300,9 +309,9 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
 
         <div class="section-box">
           <strong>Bank Details:</strong><br/>
-          TAMILNADU MERCANTILE BANK LTD<br/>
-          A/c No: 13215050801030<br/>
-          Branch & IFS: Sattur & TMBL0000132
+          HDFC Bank<br/>
+          A/c No: 50200055286191<br/>
+          Branch & IFSC: Kovilpatti & HDFC0002021
         </div>
 
         <div class="section-box">
@@ -343,15 +352,15 @@ export const exportProductsToPDF = (data: any[], type: 'bills' | 'products') => 
       format(new Date(bill.timestamp), 'dd/MM/yyyy HH:mm'),
       itemDetails,
       `Rs.${bill.subtotal.toFixed(2)}`,
-      `Rs.${bill.totalGst.toFixed(2)}`,
-      `Rs.${bill.totalDiscount.toFixed(2)}`,
+      // `Rs.${bill.totalGst.toFixed(2)}`,
+      `- Rs.${bill.totalDiscount.toFixed(2)}`,
       `Rs.${bill.grandTotal.toFixed(2)}`
     ];
   });
 
 
     (doc as any).autoTable({
-      head: [['Bill ID', 'Date', 'Items (Name xQty - Price)', 'Subtotal', 'GST', 'Discount', 'Total']],
+      head: [['Bill ID', 'Date', 'Items (Name xQty - Price)', 'Subtotal', 'Discount', 'Total']],
       body: billRows,
       startY: 20,
     });
@@ -406,7 +415,7 @@ export const exportToWord = async (data: any[], type: 'bills' | 'products') => {
                       item.items.map((i:any) => `${i.name} (x${i.billQuantity}) - Rs.${i.price}`).join(', '),
                       `Rs.${item.subtotal.toFixed(2)}`,
                       `Rs.${item.totalGst.toFixed(2)}`,
-                      `Rs.${item.totalDiscount.toFixed(2)}`,
+                      `- Rs.${item.totalDiscount.toFixed(2)}`,
                       `Rs.${item.grandTotal.toFixed(2)}`
                     ].map(cell => new TableCell({ children: [new Paragraph({ text: cell })] }))
                   : [
