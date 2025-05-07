@@ -7,6 +7,7 @@ from utils import get_next_product_code
 from database import product_collection, bill_collection, user_collection
 from typing import Optional
 from datetime import datetime
+from pymongo import UpdateOne
 
 app = FastAPI()
 
@@ -91,6 +92,23 @@ def get_products(
 @app.post("/bills/")
 def create_bill(bill: Bill):
     bill_dict = bill.dict()
+
+    bulk_operations = []
+    for item in bill_dict["items"]:
+        product_code = item["code"]
+        quantity_sold = item["billQuantity"]
+
+        bulk_operations.append(
+            UpdateOne(
+                {"code": product_code},
+                {"$inc": {"quantity": -quantity_sold}}
+            )
+        )
+
+    if bulk_operations:
+        result = product_collection.bulk_write(bulk_operations)
+        print(f"Matched: {result.matched_count}, Modified: {result.modified_count}")
+
     result = bill_collection.insert_one(bill_dict)
     return {"message": "Bill saved", "id": str(result.inserted_id)}
 
