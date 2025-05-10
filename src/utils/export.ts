@@ -27,10 +27,10 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
     doc.setFontSize(12);
     doc.text('M.A.S. TRADERS', 14, 20);
     doc.setFontSize(10);
-    doc.text('629/A Bypass Road, Sattur-626203', 14, 26);
-    doc.text('Ph: 9385811577', 14, 31);
-    doc.text('Ph: 9789523734', 14, 36);
-    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 41);
+    doc.text('NO.1C2 NEAR RAJMAHAL KALAYANA MANDAPAM,', 14, 26);
+    doc.text('PARK EAST STREET, KOVILPATTI 628502.', 14, 31);
+    doc.text('Ph: 9385811577, 9789523734', 14, 36);
+    doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 41);
     doc.text('State: Tamil Nadu, Code: 33', 14, 46);
     doc.rect(12, 15, 90, 35); // Seller info border
 
@@ -265,10 +265,10 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
           <div style="width: 60%;">
             <div class="section-box">
               <strong>M.A.S. TRADERS</strong><br/>
-              629/A Bypass Road, Sattur-626203<br/>
-              Ph: 9385811577<br/>
-              Ph: 9789523734<br/>
-              GSTIN/UIN: 33CEPS9062G1ZL<br/>
+              NO.1C2 NEAR RAJMAHAL KALAYANA MANDAPAM,<br/>
+              PARK EAST STREET, KOVILPATTI 628502.<br/>
+              Ph: 9385811577, 9789523734<br/>
+              GSTIN/UIN: 33AVMPM1750G1ZO<br/>
               State: Tamil Nadu, Code: 33
             </div>
 
