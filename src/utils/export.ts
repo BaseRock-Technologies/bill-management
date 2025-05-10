@@ -264,7 +264,7 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
         <div class="flex">
           <div style="width: 60%;">
             <div class="section-box">
-              <strong>SIVARAM TRADERS</strong><br/>
+              <strong>M.A.S. TRADERS</strong><br/>
               629/A Bypass Road, Sattur-626203<br/>
               Ph: 9385811577<br/>
               Ph: 9789523734<br/>
