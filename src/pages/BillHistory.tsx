@@ -172,7 +172,9 @@ const BillHistory = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{bill.items.length}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.subtotal.toFixed(2)}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst?.toFixed(2)}</td>
+                        {/* <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst?.toFixed(2)}</td> */}
+                        <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalCGst?.toFixed(2)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalSGst?.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalDiscount.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">₹{bill.grandTotal.toFixed(2)}</td>
                     </tr>
