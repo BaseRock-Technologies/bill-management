@@ -36,7 +36,7 @@ const Profile = () => {
 
       try {
         const payload = { username, password: formData.newPassword };
-          const response = await fetch("http://46.202.162.192:8000/users/update-password/", {
+          const response = await fetch("http://168.231.66.208:8000/users/update-password/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

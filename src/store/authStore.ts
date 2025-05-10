@@ -15,8 +15,8 @@ const ADMIN_CREDENTIALS = {
   password: 'admin'
 };
 
-const backendURL = 'http://localhost:8000';
-// const backendURL = 'http://46.202.162.192:8000';
+// const backendURL = 'http://localhost:8000';
+const backendURL = 'http://168.231.66.208:8000';
 
 export const useAuthStore = create<AuthState>()(
   persist(

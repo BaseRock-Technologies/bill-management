@@ -3,13 +3,15 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm install
 
 COPY . .
-
 RUN npm run build
+
+# Install lightweight static server
+RUN npm install -g serve
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host"]
+# Serve the built app from /dist
+CMD ["serve", "-s", "dist", "-l", "5173"]

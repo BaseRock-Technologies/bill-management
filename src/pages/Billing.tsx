@@ -65,7 +65,7 @@ const Billing = () => {
     const totalDiscount = selectedProducts.reduce((acc, item) => acc + (item.discount || 0), 0);
     const grandTotal = subtotal + totalGst - totalDiscount;
 
-    return { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal };
+    return { subtotal, totalCGst, totalSGst, totalDiscount, grandTotal };
   };
 
   const handleCreateBill = () => {
@@ -80,7 +80,7 @@ const Billing = () => {
     setSelectedProducts([]);
   };
 
-  const { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal } = calculateTotals();
+  const { subtotal, totalCGst, totalSGst, totalDiscount, grandTotal } = calculateTotals();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
