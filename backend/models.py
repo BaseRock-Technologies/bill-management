@@ -29,7 +29,7 @@ class Bill(BaseModel):
     items: List[BillItem]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     subtotal: float
-    # totalGst: float
+    totalGst: float
     totalCGst: float
     totalSGst: float
     totalDiscount: float

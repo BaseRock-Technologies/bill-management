@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Query
 
 from models import Product, Bill, BillItem, UserLogin
-from utils import get_next_product_code
+from utils import get_next_bill_id, get_next_product_code
 from database import product_collection, bill_collection, user_collection
 from typing import Optional
 from datetime import datetime
@@ -90,8 +90,11 @@ def get_products(
 
 # Bill Management
 @app.post("/bills/")
-def create_bill(bill: Bill):
+async def create_bill(bill: Bill):
+    bill_id = await get_next_bill_id()
+    
     bill_dict = bill.dict()
+    bill_dict["id"] = bill_id
 
     bulk_operations = []
     for item in bill_dict["items"]:
