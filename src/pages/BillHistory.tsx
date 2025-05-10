@@ -170,7 +170,7 @@ const BillHistory = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">{bill.items.length}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.subtotal.toFixed(2)}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst.toFixed(2)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalGst?.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">₹{bill.totalDiscount.toFixed(2)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">₹{bill.grandTotal.toFixed(2)}</td>
                     </tr>
@@ -230,7 +230,7 @@ const BillHistory = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">GST:</span>
-                      <span className="text-sm">₹{bill.totalGst.toFixed(2)}</span>
+                      <span className="text-sm">₹{bill.totalGst?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Discount:</span>

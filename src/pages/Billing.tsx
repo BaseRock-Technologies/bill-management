@@ -13,8 +13,6 @@ const Billing = () => {
   const { addBill, getBills, bills } = useBillStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<BillItem[]>([]);
-  const [CGstPercentage, setCGstPercentage] = useState<number>(0);
-  const [SGstPercentage, setSGstPercentage] = useState<number>(0);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -62,10 +60,10 @@ const Billing = () => {
   const calculateTotals = () => {
     const subtotal = selectedProducts.reduce((acc, item) => acc + item.total, 0);
     const totalGst = selectedProducts.reduce((acc, item) => acc + item.gstAmount, 0);
-    const totalCGst = (subtotal * (CGstPercentage || 0)) / 100;
-    const totalSGst = (subtotal * (SGstPercentage || 0)) / 100;
+    const totalCGst = totalGst / 2;
+    const totalSGst = totalGst / 2;
     const totalDiscount = selectedProducts.reduce((acc, item) => acc + (item.discount || 0), 0);
-    const grandTotal = subtotal + totalGst + totalCGst + totalSGst - totalDiscount;
+    const grandTotal = subtotal + totalGst - totalDiscount;
 
     return { subtotal, totalGst, totalCGst, totalSGst, totalDiscount, grandTotal };
   };
@@ -194,34 +192,6 @@ const Billing = () => {
                   </tbody>
                 </table>
 
-                <div className="flex justify-end items-center mt-2 border-t pt-2">
-                  <div className="flex items-center mr-4">
-                    <span className="text-sm text-gray-600">CGST (%) :</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      onChange={(e) => {
-                        setCGstPercentage(Number(e.target.value));
-                      }}
-                      className="w-20 md:w-24"
-                    />
-                  </div>
-                  <div className="flex items-center mr-4">
-
-                    <span className="text-sm text-gray-600">SGST (%) :</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      onChange={(e) => {
-                        setSGstPercentage(Number(e.target.value));
-                      }}
-                      className="w-20 md:w-24"
-                    /> 
-                  </div>
-                </div>
-
                 <div className="mt-2 border-t pt-2">
                   <div className="flex justify-end">
                     <div className="w-full md:w-72 space-y-2">
@@ -229,10 +199,10 @@ const Billing = () => {
                         <span className="text-gray-600">Subtotal:</span>
                         <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="text-gray-600">GST:</span>
                         <span className="font-medium">₹{totalGst.toFixed(2)}</span>
-                      </div>
+                      </div> */}
                       <div className="flex justify-between">
                         <span className="text-gray-600">CGST:</span>
                         <span className="font-medium">₹{totalCGst.toFixed(2)}</span>

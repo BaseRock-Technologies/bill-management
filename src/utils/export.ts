@@ -28,10 +28,11 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
     doc.text('SIVARAM TRADERS', 14, 20);
     doc.setFontSize(10);
     doc.text('629/A Bypass Road, Sattur-626203', 14, 26);
-    doc.text('Ph: 9600662773', 14, 31);
-    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 36);
-    doc.text('State: Tamil Nadu, Code: 33', 14, 41);
-    doc.rect(12, 15, 90, 30); // Seller info border
+    doc.text('Ph: 9385811577', 14, 31);
+    doc.text('Ph: 9789523734', 14, 36);
+    doc.text('GSTIN/UIN: 33CEPS9062G1ZL', 14, 41);
+    doc.text('State: Tamil Nadu, Code: 33', 14, 46);
+    doc.rect(12, 15, 90, 35); // Seller info border
 
     // Invoice Info box
     doc.setFontSize(10);
@@ -42,12 +43,12 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
 
     // Buyer Info box
     doc.setFontSize(11);
-    doc.text('Buyer:', 14, 52);
+    doc.text('Buyer:', 14, 55);
     doc.setFontSize(10);
     BuyerAddress.slice(0, 5).forEach((line, i) => {
-      doc.text(line || ' ', 14, 57 + i * 5); // 5pt spacing between lines
+      doc.text(line || ' ', 14, 60 + i * 5); // 5pt spacing between lines
     });
-    doc.rect(12, 48, 90, 35); // Buyer info border
+    doc.rect(12, 50, 90, 32); // Buyer info border
 
    // Combined Product + Totals Table
   const combinedRows: any[] = [];
@@ -68,7 +69,7 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
   // Add summary total rows (bold)
   const summaryRows = [
     ['Subtotal', bill.subtotal],
-    ['GST', bill.totalGst],
+    // ['GST', bill.totalGst],
     ['CGST', bill.totalCGst],
     ['SGST', bill.totalSGst],
     ['Discount', bill.totalDiscount]
@@ -231,7 +232,7 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
 
     const summaryRows = [
       ['Subtotal', bill.subtotal],
-      ['GST', bill.totalGst],
+      // ['GST', bill.totalGst],
       ['CGST', bill.totalCGst],
       ['SGST', bill.totalSGst],
       ['Discount', bill.totalDiscount],
@@ -257,7 +258,8 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
             <div class="section-box">
               <strong>SIVARAM TRADERS</strong><br/>
               629/A Bypass Road, Sattur-626203<br/>
-              Ph: 9600662773<br/>
+              Ph: 9385811577<br/>
+              Ph: 9789523734<br/>
               GSTIN/UIN: 33CEPS9062G1ZL<br/>
               State: Tamil Nadu, Code: 33
             </div>
