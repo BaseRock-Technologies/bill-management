@@ -88,13 +88,22 @@ def get_products(
     products = list(product_collection.find(filters, {"_id": 0}).skip(skip).limit(limit))
     return products
 
+def get_next_bill_id():
+    result = product_collection.counters.find_one_and_update(
+        {"_id": "bill_id"},
+        {"$inc": {"seq": 1}},
+        return_document=True,
+        upsert=True
+    )
+    return result["seq"]
+
 # Bill Management
 @app.post("/bills/")
-async def create_bill(bill: Bill):
-    bill_id = await get_next_bill_id()
+def create_bill(bill: Bill):
+    bill_id = get_next_bill_id()
     
     bill_dict = bill.dict()
-    bill_dict["id"] = bill_id
+    bill_dict["_id"] = bill_id
 
     bulk_operations = []
     for item in bill_dict["items"]:

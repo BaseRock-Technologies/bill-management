@@ -181,7 +181,7 @@ const BillHistory = () => {
                       {
                         expandedBillIds.includes(bill.id) && (
                           <tr className="bg-gray-50">
-                            <td colSpan={8} className="px-4 py-4">
+                            <td colSpan={9} className="px-4 py-4">
                               <div className="space-y-2">
                                 {bill.items.map((item, index) => (
                                   <div key={index} className="flex gap-x-10 text-sm border-b py-1">
