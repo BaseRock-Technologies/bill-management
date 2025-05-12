@@ -24,7 +24,7 @@ export const useBillStore = create<BillState>()(
         const totalDiscount = items.reduce((acc, item) => acc + (item.discount || 0), 0);
         const totalCGst = totalCGstParam;
         const totalSGst = totalSGstParam;
-        const grandTotal = subtotal + totalGst + totalCGstParam + totalSGstParam - totalDiscount;
+        const grandTotal = subtotal + totalGst - totalDiscount;
 
         const newBill: Bill = {
           id: uuidv4(),
