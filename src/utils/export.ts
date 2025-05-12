@@ -27,7 +27,7 @@ export const exportToPDF = (selectedBills: Bill[], BuyerAddress: string[]) => {
     doc.setFontSize(12);
     doc.text('M.A.S. TRADERS', 14, 20);
     doc.setFontSize(10);
-    doc.text('NO.1C2 NEAR RAJMAHAL KALAYANA MANDAPAM,', 14, 26);
+    doc.text('NO.1C2 NEAR RAJMAHAL KALYANA MANDAPAM,', 14, 26);
     doc.text('PARK EAST STREET, KOVILPATTI 628502.', 14, 31);
     doc.text('Ph: 9385811577, 9789523734', 14, 36);
     doc.text('GSTIN/UIN: 33AVMPM1750G1ZO', 14, 41);
@@ -330,7 +330,7 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
     `;
   }).join('');
 
-  newWindow.document.write(`<html><head><title>Print Bills</title>${styles}</head><body>${content}</body></html>`);
+  newWindow.document.write(`<html><head>${styles}</head><body>${content}</body></html>`);
   newWindow.document.close();
   newWindow.focus();
   newWindow.print();
