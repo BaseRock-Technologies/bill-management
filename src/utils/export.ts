@@ -179,9 +179,15 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
   const styles = `
     <style>
       @media print {
+        @page {
+          margin: 0;
+          size: A4;
+        }
         body {
           margin: 0;
           font-family: Arial, sans-serif;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         .invoice {
           width: 100%;
@@ -189,6 +195,7 @@ export const printBills = (selectedBills: Bill[], BuyerAddress: string[]) => {
           box-sizing: border-box;
           page-break-after: always;
           border: 1px solid #000;
+          margin: 0;
         }
         .section-box {
           border: 1px solid #000;
